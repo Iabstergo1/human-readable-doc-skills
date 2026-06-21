@@ -1,6 +1,12 @@
 ---
 name: human-readable-document-workflow
-description: Trigger when the user asks to create, draft, revise, polish, structure, export, typeset, or generate a document, report, article, paper, proposal, README, Markdown file, Word document, PDF, academic writing, technical documentation, business document, meeting notes, or other long-form written artifact. Do not trigger for short casual answers unless the user explicitly asks for a reusable document.
+description: >-
+  Trigger when the user asks to create, draft, revise, polish, structure,
+  export, typeset, or generate a document, report, article, paper, proposal,
+  README, Markdown file, Word document, PDF, academic writing, technical
+  documentation, business document, meeting notes, or other long-form written
+  artifact. Do not trigger for short casual answers unless the user explicitly
+  asks for a reusable document.
 ---
 
 # Human Readable Document Workflow

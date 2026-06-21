@@ -37,6 +37,15 @@ REQUIRED_SCRIPTS = [
     "scripts/validate_skill.py",
 ]
 
+REQUIRED_DESCRIPTION = (
+    "Trigger when the user asks to create, draft, revise, polish, structure, "
+    "export, typeset, or generate a document, report, article, paper, proposal, "
+    "README, Markdown file, Word document, PDF, academic writing, technical "
+    "documentation, business document, meeting notes, or other long-form written "
+    "artifact. Do not trigger for short casual answers unless the user explicitly "
+    "asks for a reusable document."
+)
+
 UPSTREAM_URLS = [
     "https://github.com/xxsang/writers-loop",
     "https://github.com/xxsang/writers-loop/tree/main/skills/writers-loop",
@@ -71,7 +80,7 @@ def parse_frontmatter(skill_path: Path) -> dict[str, object]:
     lines = text.splitlines()
     result: dict[str, object] = {
         "ok": False,
-        "has_opening": bool(lines and lines[0].strip() == "---"),
+        "has_opening": bool(lines and lines[0] == "---"),
         "has_closing": False,
         "name": None,
         "description": None,
@@ -79,29 +88,57 @@ def parse_frontmatter(skill_path: Path) -> dict[str, object]:
     }
     errors: list[str] = result["errors"]  # type: ignore[assignment]
     if not result["has_opening"]:
-        errors.append("frontmatter-missing-opening")
+        errors.append("frontmatter-first-line-must-be-exactly-dashes")
         return result
     closing = None
     for index, line in enumerate(lines[1:], start=2):
-        if line.strip() == "---":
+        if line == "---":
             closing = index
             break
+        if line.strip() == "---" and line != "---":
+            errors.append(f"frontmatter-closing-not-standalone:{index}")
     if closing is None:
         errors.append("frontmatter-missing-closing")
         return result
     result["has_closing"] = True
     frontmatter_lines = lines[1 : closing - 1]
     data: dict[str, str] = {}
+    scalar_key: str | None = None
+    scalar_lines: list[str] = []
+
     for line in frontmatter_lines:
-        if ":" not in line:
+        if scalar_key is not None and (line.startswith(" ") or line == ""):
+            scalar_lines.append(line.strip())
+            continue
+        if scalar_key is not None:
+            data[scalar_key] = " ".join(part for part in scalar_lines if part)
+            scalar_key = None
+            scalar_lines = []
+        if ":" not in line or line.startswith(" "):
             errors.append(f"frontmatter-invalid-line:{line}")
             continue
         key, value = line.split(":", 1)
-        data[key.strip()] = value.strip()
+        key = key.strip()
+        value = value.strip()
+        if key == "description" and value in {">", ">-"}:
+            scalar_key = key
+            scalar_lines = []
+        else:
+            data[key] = value
+
+    if scalar_key is not None:
+        data[scalar_key] = " ".join(part for part in scalar_lines if part)
+
     result["name"] = data.get("name")
     result["description"] = data.get("description")
     if result["name"] != "human-readable-document-workflow":
         errors.append("frontmatter-name-invalid")
+    if result["description"] != REQUIRED_DESCRIPTION:
+        errors.append("frontmatter-description-invalid")
+    allowed_keys = {"name", "description"}
+    extra_keys = sorted(set(data) - allowed_keys)
+    if extra_keys:
+        errors.append(f"frontmatter-extra-keys:{','.join(extra_keys)}")
     if not result["description"]:
         errors.append("frontmatter-description-missing")
     result["ok"] = not errors
@@ -129,6 +166,58 @@ def check_script_help(script: Path) -> dict[str, object]:
     }
 
 
+def py_compile_script(script: Path) -> dict[str, object]:
+    completed = subprocess.run(
+        [sys.executable, "-m", "py_compile", str(script)],
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=15,
+    )
+    return {
+        "script": script.name,
+        "returncode": completed.returncode,
+        "ok": completed.returncode == 0,
+        "stderr": completed.stderr.strip(),
+    }
+
+
+def python_line_issues(skill_dir: Path) -> dict[str, object]:
+    warnings: list[dict[str, object]] = []
+    errors: list[dict[str, object]] = []
+    for path in (skill_dir / "scripts").glob("*.py"):
+        lines = path.read_text(encoding="utf-8").splitlines()
+        if len(path.read_text(encoding="utf-8")) > 500 and len(lines) < 10:
+            errors.append(
+                {
+                    "path": rel(path, skill_dir),
+                    "line": None,
+                    "issue": "compressed-python",
+                    "line_count": len(lines),
+                }
+            )
+        for line_no, line in enumerate(lines, start=1):
+            if len(line) > 400:
+                errors.append(
+                    {
+                        "path": rel(path, skill_dir),
+                        "line": line_no,
+                        "issue": "python-line-too-long",
+                        "length": len(line),
+                    }
+                )
+            elif len(line) > 240:
+                warnings.append(
+                    {
+                        "path": rel(path, skill_dir),
+                        "line": line_no,
+                        "issue": "python-line-long",
+                        "length": len(line),
+                    }
+                )
+    return {"ok": not errors, "warnings": warnings, "errors": errors}
+
+
 def markdown_issues(repo_root: Path, max_line_length: int) -> list[dict[str, object]]:
     issues: list[dict[str, object]] = []
     for path in repo_root.rglob("*.md"):
@@ -141,9 +230,23 @@ def markdown_issues(repo_root: Path, max_line_length: int) -> list[dict[str, obj
             continue
         if re.fullmatch(r"(TODO|TBD|PLACEHOLDER|待补充|FIXME)[\s#\-:。.]*", stripped, flags=re.I):
             issues.append({"path": rel(path, repo_root), "line": None, "issue": "placeholder-only"})
-        for line_no, line in enumerate(text.splitlines(), start=1):
-            if path.name == "SKILL.md" and line.startswith("description:"):
-                continue
+        lines = text.splitlines()
+        critical = (
+            path.name in {"README.md", "SKILL.md", "AGENTS.md"}
+            or "references" in path.parts
+            or "assets" in path.parts
+            or "tests" in path.parts
+        )
+        if critical and len(text) > 500 and len(lines) < 8:
+            issues.append(
+                {
+                    "path": rel(path, repo_root),
+                    "line": None,
+                    "issue": "compressed-markdown",
+                    "line_count": len(lines),
+                }
+            )
+        for line_no, line in enumerate(lines, start=1):
             if len(line) > max_line_length and not re.search(r"https?://", line):
                 issues.append(
                     {
@@ -169,9 +272,12 @@ def validate(repo_root: Path, max_line_length: int) -> dict[str, object]:
     missing_required_refs = [ref for ref in REQUIRED_REFERENCES if not (skill_dir / ref).exists()]
     missing_linked_refs = [ref for ref in refs if not (skill_dir / ref).exists()]
     missing_scripts = [script for script in REQUIRED_SCRIPTS if not (skill_dir / script).exists()]
-    script_help = [check_script_help(skill_dir / script) for script in REQUIRED_SCRIPTS if (skill_dir / script).exists()]
+    script_paths = [skill_dir / script for script in REQUIRED_SCRIPTS if (skill_dir / script).exists()]
+    script_help = [check_script_help(script) for script in script_paths]
+    script_compile = [py_compile_script(script) for script in script_paths]
     assets_readme = skill_dir / "assets" / "README.md"
     md_issues = markdown_issues(repo_root, max_line_length)
+    py_line_issues = python_line_issues(skill_dir)
     attribution = readme_attribution(repo_root / "README.md")
 
     checks = {
@@ -193,6 +299,11 @@ def validate(repo_root: Path, max_line_length: int) -> dict[str, object]:
             "ok": all(item["ok"] for item in script_help),
             "items": script_help,
         },
+        "python_compile": {
+            "ok": all(item["ok"] for item in script_compile),
+            "items": script_compile,
+        },
+        "python_line_lengths": py_line_issues,
         "markdown_readability": {
             "ok": not md_issues,
             "issues": md_issues,
