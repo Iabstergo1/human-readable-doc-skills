@@ -1,27 +1,146 @@
 # English Anti-Slop Rules
 
-Clean up generic AI phrasing without making the prose casual or imprecise.
+Clean up generic AI phrasing without making the prose casual, imprecise, or
+unfaithful to the source. Preserve structure and meaning before improving tone.
 
-## Patterns To Reduce
+## Pattern Catalog
 
-- Generic openings: "In today's fast-paced world", "In the ever-evolving landscape".
-- Empty enthusiasm: "This is a game-changer", "unlock the full potential".
-- Corporate filler: "robust", "seamless", "leverage" when no mechanism is described.
-- Over-hedging: "it is important to note that", "may potentially".
-- Repetitive transitions: "firstly", "secondly", "lastly" in every section.
-- Overuse of em dashes as a default sentence connector.
-- Unsupported claims about industry consensus or best practice.
+### Generic Openings
 
-## Before And After
+- Risk: delays the actual problem.
+- Common phrases: `In today's fast-paced world`,
+  `In the ever-evolving landscape`.
+- Keep when: a public essay genuinely needs broad context.
+- Rewrite: start with the object, constraint, or reader problem.
 
-Before: In today's fast-paced digital landscape, a robust PDF preprocessing pipeline is essential for unlocking seamless document intelligence.
+### Corporate Filler
 
-After: A PDF preprocessing pipeline should make extraction, OCR, metadata cleanup, and downstream indexing predictable.
+- Risk: sounds polished but says little.
+- Common phrases: `robust`, `seamless`, `leverage`, `streamline`.
+- Keep when: the term is defined by product or domain vocabulary.
+- Rewrite: replace with mechanism, measurable effect, or boundary.
 
-Before: It is important to note that this approach may potentially improve scalability.
+### Empty Enthusiasm
 
-After: This approach improves scalability when large files are split into independent page-level jobs.
+- Risk: overpromises without evidence.
+- Common phrases: `game-changer`, `unlock the full potential`,
+  `revolutionary`.
+- Keep when: marketing copy is explicitly requested.
+- Rewrite: state the observable improvement and condition.
 
-Before: This solution empowers teams to streamline workflows and drive better outcomes.
+### Over-Hedging
 
-After: This solution reduces manual cleanup by validating extracted fields before indexing.
+- Risk: weakens clear claims.
+- Common phrases: `it is important to note that`, `may potentially`,
+  `could possibly`.
+- Keep when: uncertainty is real and material.
+- Rewrite: name the condition directly.
+
+### Repetitive Transitions
+
+- Risk: creates template rhythm.
+- Common phrases: `firstly`, `secondly`, `lastly`, `moreover`.
+- Keep when: step-by-step instructions need sequence markers.
+- Rewrite: use causal, contrastive, or dependency transitions.
+
+### Em Dash Overuse
+
+- Risk: makes every sentence sound the same.
+- Common phrases: repeated dashes used as default connectors.
+- Keep when: a dash clarifies a true interruption or apposition.
+- Rewrite: use a period, colon, comma, or split sentence.
+
+### Vague Intensifiers
+
+- Risk: adds emphasis without information.
+- Common phrases: `very`, `highly`, `significantly`, `deeply`.
+- Keep when: backed by a metric or explicit comparison.
+- Rewrite: replace with a number, comparison, or remove.
+
+### Preachy Endings
+
+- Risk: turns the document into advice theater.
+- Common phrases: `Ultimately`, `It is essential to remember`.
+- Keep when: writing a speech or reflective essay.
+- Rewrite: end with a decision, risk, or next step.
+
+### Template Conclusions
+
+- Risk: repeats the introduction generically.
+- Common phrases: `In conclusion`, `This highlights...`.
+- Keep when: academic conventions require a conclusion section.
+- Rewrite: summarize actual findings and open questions.
+
+## Structure Preservation Rules
+
+- Preserve the user's heading hierarchy unless it is broken or conflicts with
+  the requested output.
+- Preserve quoted claims and cited statements unless the user asks for a
+  paraphrase.
+- Preserve technical terms, variable names, command names, file paths, and API
+  names.
+- Preserve meaning before improving rhythm.
+- Do not flatten a document into bullet points unless scanning is the goal.
+
+## Markdown Protection Rules
+
+Do not rewrite destructively:
+
+- YAML frontmatter.
+- Code fences.
+- URLs.
+- Tables.
+- Quoted source material unless the user asks.
+- Citations, footnotes, and bibliography entries.
+- Math, formulas, variables, and symbols.
+
+When a protected block contains weak prose, report it as a note instead of
+changing it automatically.
+
+## Examples
+
+Bad:
+
+```markdown
+In today's fast-paced digital landscape, a robust PDF preprocessing pipeline is
+essential for unlocking seamless document intelligence.
+```
+
+Better:
+
+```markdown
+A PDF preprocessing pipeline should make extraction, OCR, metadata cleanup, and
+downstream indexing predictable.
+```
+
+Bad:
+
+```markdown
+It is important to note that this approach may potentially improve scalability.
+```
+
+Better:
+
+```markdown
+This approach improves scalability when large files are split into independent
+page-level jobs.
+```
+
+Bad:
+
+```markdown
+This solution empowers teams to streamline workflows and drive better outcomes.
+```
+
+Better:
+
+```markdown
+This solution reduces manual cleanup by validating extracted fields before
+indexing.
+```
+
+## Boundaries
+
+Do not remove necessary caution from academic, legal, medical, or financial
+writing. Hedging is appropriate when evidence is incomplete, causal direction is
+uncertain, or the user supplied tentative source material.

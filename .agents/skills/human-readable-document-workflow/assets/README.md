@@ -1,15 +1,27 @@
 # Assets
 
-`reference.docx` is a minimal placeholder Word reference document. Replace it with your own style template before production use.
+Assets are files used by the skill at output time. They should not become a
+second instruction system; durable rules belong in `references/`.
 
-Recommended replacement process:
+## Files
 
-1. Create a Word document with the desired heading, paragraph, table, code, and caption styles.
+| Path | Purpose | Maintenance note |
+| --- | --- | --- |
+| `reference.docx` | Minimal Word reference document for Pandoc. | Replace with a real template when production styling matters. |
+| `templates/report.typ` | Typst template placeholder. | Expand only when a Typst route is actively used. |
+| `quarto/_quarto.yml` | Quarto configuration placeholder. | Keep small and renderer-focused. |
+| `examples/` | Good and bad prose samples for style checks. | Keep examples short and clearly labeled. |
+
+## Replacing The Word Template
+
+1. Create a Word document with heading, paragraph, table, code, and caption
+   styles.
 2. Save it as `reference.docx`.
-3. Keep the path `assets/reference.docx` unchanged, or pass another path to `render_with_pandoc.py --reference-doc`.
+3. Keep the path `assets/reference.docx`, or pass another path to
+   `render_with_pandoc.py --reference-doc`.
 
-Other folders:
+## Boundaries
 
-- `templates/report.typ`: Typst template placeholder.
-- `quarto/_quarto.yml`: Quarto project/output configuration placeholder.
-- `examples/`: Short good/bad writing samples for style comparison.
+Do not store private client templates, credentials, or large generated outputs
+in this directory. If a template comes from a third party, document its license
+and origin before committing it.

@@ -5,96 +5,118 @@ description: Trigger when the user asks to create, draft, revise, polish, struct
 
 # Human Readable Document Workflow
 
-Use this skill as the orchestration layer for long-form document work. Keep detailed rules in `references/` and use scripts for deterministic checks or rendering steps.
+Use this skill as the orchestration layer for long-form document work. Keep the
+main file short: route the task, load only relevant references, use scripts for
+deterministic checks, and deliver a readable source document before any rendered
+artifact.
+
+## Trigger Boundary
+
+Use this skill when the user asks to create, draft, rewrite, polish, structure,
+typeset, export, or validate a reusable document. Typical deliverables include
+Markdown, Word, PDF, technical design docs, academic writing, reports,
+proposals, README files, SOPs, meeting notes, and email drafts.
+
+Do not use this skill for short casual answers, code-only implementation tasks,
+or one-line rewrites unless the user explicitly wants a reusable document.
+
+## Routing
+
+First identify:
+
+- `document_type`: use `references/12-document-type-profiles.md`.
+- `language`: `zh-CN`, `en`, or `mixed`.
+- `target_format`: `Markdown`, `docx`, `pdf`, `html`, `slides`, `chat answer`,
+  or `unknown`.
+- `source_boundary`: user-provided facts, missing sources, claims that need
+  citation, and content that must not be changed.
+
+Use `scripts/detect_doc_intent.py` when the request is file-based, ambiguous,
+or likely to be repeated in automation.
 
 ## Reference Loading
 
-Read only the references needed for the task:
+Read only the references needed for the current task:
 
 - Routing and defaults: `references/00-routing-policy.md`
 - Writing loop: `references/01-writing-loop.md`
 - General readability: `references/02-human-readable-style.md`
-- Simplified Chinese style cleanup: `references/03-anti-ai-slop-zh.md`
-- English style cleanup: `references/04-anti-ai-slop-en.md`
+- Simplified Chinese anti-AI style: `references/03-anti-ai-slop-zh.md`
+- English anti-AI style: `references/04-anti-ai-slop-en.md`
 - Academic writing: `references/05-academic-writing.md`
 - Layout rules: `references/06-document-layout.md`
 - Markdown source rules: `references/07-markdown-authoring.md`
 - Word export: `references/08-word-export.md`
 - PDF export: `references/09-pdf-export.md`
 - Final checks: `references/10-quality-gates.md`
+- Upstream attribution: `references/11-upstream-attribution.md`
+- Document type profiles: `references/12-document-type-profiles.md`
+- Workflow examples: `references/13-workflow-examples.md`
 
-## 0. Detect Document Intent
+## Four-Layer Framework
 
-Determine whether the user asks to generate, draft, organize, revise, export, typeset, or polish a document.
+Apply these layers in order. Compress the visible process for short tasks, but
+do not skip fact-boundary checks.
 
-Identify:
+1. **Writing workflow layer**
+   Load `references/01-writing-loop.md`. Important documents must pass through
+   at least `plan -> draft -> critique -> revise`.
 
-- Target format: `chat answer`, `Markdown`, `docx`, `pdf`, `html`, `slides`, or `unknown`.
-- Document type: `technical`, `academic`, `business`, `proposal`, `manual`, `README`, `meeting-notes`, `email`, or `general`.
-- Language: `zh-CN`, `en`, or `mixed`.
+2. **Human-readable style and anti-AI layer**
+   Load `references/02-human-readable-style.md` and the language-specific
+   anti-slop reference:
+   `references/03-anti-ai-slop-zh.md` for Chinese,
+   `references/04-anti-ai-slop-en.md` for English, or both for mixed text.
 
-If information is missing but work can start, choose reasonable defaults and continue. Do not repeatedly ask clarification questions.
+3. **Document structure layer**
+   Load the profile from `references/12-document-type-profiles.md`.
+   Also load `references/05-academic-writing.md` for academic papers,
+   literature reviews, thesis sections, model descriptions, citation work, or
+   any text that uses scholarly claims, variables, symbols, or references.
 
-Use `scripts/detect_doc_intent.py` when deterministic routing is useful.
+4. **Rendering and layout layer**
+   Load `references/06-document-layout.md`,
+   `references/07-markdown-authoring.md`, and the export references needed for
+   the requested artifacts:
+   `references/08-word-export.md` for Word,
+   `references/09-pdf-export.md` for PDF.
 
-## 1. Intake
+## Markdown Source Rule
 
-Extract the user's goal, reader, use case, length, format, tone, source material, required content, and content that must not be changed.
+Markdown is the canonical source for substantial documents. If the user asks for
+Word or PDF, first produce or update a clean Markdown source draft, then render
+or provide the render command. Do not treat `.docx` or `.pdf` as formats the
+model should fake directly.
 
-If the user provides source text, preserve its facts and do not invent unsupported details. If the user asks for Word or PDF, first produce structured Markdown source, then use the layout/export path.
+## Script Use
 
-## 2. Frame
+Use scripts when deterministic checks are useful:
 
-State the document's problem, reader concerns, and delivery boundary.
+- `scripts/detect_doc_intent.py`: classify document intent, type, language,
+  target format, recommended references, and recommended scripts.
+- `scripts/lint_ai_style.py`: scan file-based drafts for common AI-style
+  patterns while protecting Markdown frontmatter, code fences, tables, URLs,
+  quotes, and citations.
+- `scripts/normalize_markdown.py`: check or fix Markdown spacing, frontmatter,
+  headings, code fences, table spacing, long lines, and list density.
+- `scripts/render_with_pandoc.py`: render Markdown to Word or PDF when Pandoc is
+  available.
+- `scripts/validate_outputs.py`: validate generated Markdown, docx, pdf, and
+  obvious placeholders.
+- `scripts/validate_skill.py`: validate this skill package after edits.
 
-Avoid generic framing such as "本文将深入探讨" or "具有重要意义". For technical documents, prioritize `what / why / how / caveats / next steps`. For academic documents, prioritize concept definitions, consistent notation, and complete argument chains.
+## Quality Gates
 
-## 3. Plan
+Before final delivery, load `references/10-quality-gates.md` and verify:
 
-Create a short structure plan before drafting.
+- The document matches the user's goal, reader, language, and target format.
+- Facts, claims, citations, and assumptions stay inside the available source
+  boundary.
+- The prose is readable without forced casualness or obvious AI patterns.
+- Markdown is renderable, with stable headings, tables, code blocks, captions,
+  formulas, and links.
+- Word/PDF requests have a Markdown source and either a rendered artifact or a
+  clear local render command.
 
-Keep heading depth shallow. Prefer paragraphs; use lists only when scanning is clearly better. For Markdown, Word, and PDF outputs, ensure headings, tables, code blocks, image captions, citations, and appendices can be rendered reliably.
-
-## 4. Draft
-
-Write clear, natural, readable prose.
-
-Avoid obvious AI style: no preachy tone, empty grand conclusions, repeated `first / second / finally`, mechanical parallelism, or unsupported broad claims. For Chinese, default to concise and concrete paragraphs with natural sentence variation. For technical content, accuracy and actionability are primary. For academic content, conceptual clarity, rigor, and notation consistency are primary.
-
-## 5. Critique
-
-Check the draft for:
-
-- Abstract filler or vague adjectives.
-- Common AI cliches.
-- Preachy endings.
-- Clickbait or marketing tone.
-- Excessive lists.
-- Logical jumps.
-- Unsupported factual expansion.
-- Confusing Markdown hierarchy.
-- Structures that Word/PDF renderers cannot handle reliably.
-
-Use `scripts/lint_ai_style.py` for a deterministic style pass when the draft is file-based.
-
-## 6. Revise
-
-Revise based on the critique.
-
-Prioritize clarity, structural continuity, factual fidelity, and reader usefulness. Do not add filler, typos, forced informality, or meaningless pauses just to make text seem "human".
-
-## 7. Layout Normalize
-
-For Markdown output, use or follow `scripts/normalize_markdown.py`.
-
-For Word output, use Markdown source plus `assets/reference.docx` as the rendering base.
-
-For PDF output, prefer Pandoc, Typst, or Quarto. Do not hand-write complex LaTeX unless the user explicitly asks and the project requires it.
-
-If required tools are unavailable, produce clean Markdown and give the local render command needed to finish the export.
-
-## 8. Quality Gates
-
-Use `references/10-quality-gates.md` before final delivery.
-
-For important documents, check structure, style, format, factual boundary, and target-format consistency. In the final answer, show only the artifact or summary the user needs; do not expose the full internal reasoning trace.
+In the final answer, provide the artifact path, rendered output, or concise
+summary the user needs. Do not expose the internal critique trace unless asked.

@@ -1,39 +1,95 @@
 # PDF Export
 
-Prefer clear and stable PDF generation over decorative complexity.
+Prefer stable, auditable PDF generation over decorative complexity. A PDF is a
+rendered artifact; Markdown remains the canonical source unless the user
+explicitly asks for a renderer-native source such as Typst.
 
-## Supported Routes
+## Route Selection
 
-1. Pandoc plus a LaTeX template or default PDF engine.
-2. Quarto using `assets/quarto/_quarto.yml`.
-3. Typst using `assets/templates/report.typ`.
+| Route | Use when | Notes |
+| --- | --- | --- |
+| Pandoc | General Markdown to PDF conversion. | Needs Pandoc and usually a PDF engine. |
+| Quarto | Reports with executable notebooks, citations, or project config. | Use `assets/quarto/_quarto.yml` as a starting point. |
+| Typst | Controlled PDF layout with a Typst template. | Use `assets/templates/report.typ` when the source is Typst-ready. |
+| Markdown only | Tools are missing or user asks only for source. | Provide commands and limitations plainly. |
 
-## Pandoc Example
+## Markdown Requirements Before PDF
+
+- Use one H1 and stable heading hierarchy.
+- Keep tables simple and avoid layout tables.
+- Add captions or explanatory text for figures, tables, and formulas.
+- Mark code block languages.
+- Avoid manual spaces for alignment.
+- Use YAML frontmatter for title, author, date, abstract, and metadata when
+  useful.
+
+## Pandoc Commands
+
+Dry-run command construction:
+
+```powershell
+python .\.agents\skills\human-readable-document-workflow\scripts\render_with_pandoc.py `
+  .\draft.md --to pdf --output .\draft.pdf --dry-run
+```
+
+Render with default PDF route:
 
 ```powershell
 python .\.agents\skills\human-readable-document-workflow\scripts\render_with_pandoc.py `
   .\draft.md --to pdf --output .\draft.pdf
 ```
 
-With a PDF engine:
+Render with a PDF engine:
 
 ```powershell
 python .\.agents\skills\human-readable-document-workflow\scripts\render_with_pandoc.py `
   .\draft.md --to pdf --output .\draft.pdf --pdf-engine xelatex
 ```
 
-## Quarto Example
+## Quarto Route
+
+Use Quarto when the document is closer to a computational report.
 
 ```powershell
-quarto render .\draft.qmd --to pdf --project .\.agents\skills\human-readable-document-workflow\assets\quarto
+quarto render .\draft.qmd --to pdf
 ```
 
-## Typst Example
+If project-level config is needed, copy or adapt:
+
+```text
+.agents\skills\human-readable-document-workflow\assets\quarto\_quarto.yml
+```
+
+## Typst Route
+
+Use Typst when layout control matters and the project already accepts Typst.
 
 ```powershell
 typst compile .\draft.typ .\draft.pdf
 ```
 
-## Fallback
+The template placeholder is:
 
-If local tools are missing, output clean Markdown and provide installation or render instructions. Do not claim that a PDF was created.
+```text
+.agents\skills\human-readable-document-workflow\assets\templates\report.typ
+```
+
+## Validate PDF
+
+```powershell
+python .\.agents\skills\human-readable-document-workflow\scripts\validate_outputs.py `
+  .\draft.pdf --markdown .\draft.md --pretty
+```
+
+## Examples
+
+Good: "Generate `draft.md`, then render `draft.pdf` with Pandoc and validate the
+PDF header."
+
+Bad: "Paste PDF-like text into chat and claim a PDF was created."
+
+## Boundaries
+
+This skill does not perform professional typesetting, OCR, or PDF repair. Use a
+dedicated PDF workflow when the task requires merging, splitting, OCR, form
+filling, or visual QA of an existing PDF.

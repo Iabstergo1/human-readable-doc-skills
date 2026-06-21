@@ -1,13 +1,39 @@
 # Human Readable Doc Skills
 
-这是一个 Codex Skills 项目，用来处理“生成、撰写、整理、导出、排版、润色某种文档”的任务。它把文档工作拆成写作流程、去 AI 腔、文档结构和确定性排版四层，避免把所有提示词塞进一个超长文件。
+This repository provides a Codex skill for document generation and revision. It
+turns broad requests such as "write a technical design", "polish this report",
+"export to Word/PDF", or "make this README clearer" into a controlled workflow:
+route the document type, load focused references, produce Markdown as the source
+of truth, and verify the result before delivery.
 
-## 项目结构
+## What This Solves
+
+- Keeps `SKILL.md` small while giving Codex deeper rules through references.
+- Separates writing workflow, human-readable style, document structure, and
+  rendering/layout rules.
+- Provides standard-library scripts for deterministic checks.
+- Treats Markdown as the canonical source for Word and PDF outputs.
+- Preserves attribution for methodology references without vendoring upstream
+  projects.
+
+## What This Does Not Solve
+
+- It does not replace domain verification for legal, medical, financial, or
+  academic claims.
+- It does not fabricate citations, benchmark data, authors, DOIs, or sources.
+- It does not directly edit Word tracked changes or repair binary PDFs.
+- It does not copy upstream skill text, prompts, templates, or repositories.
+- It does not introduce heavy dependencies; scripts use Python standard library.
+
+## Architecture
 
 ```text
 human-readable-doc-skills/
 ├── AGENTS.md
 ├── README.md
+├── tests/
+│   ├── README.md
+│   └── fixtures/
 └── .agents/
     └── skills/
         └── human-readable-document-workflow/
@@ -17,50 +43,104 @@ human-readable-doc-skills/
             └── assets/
 ```
 
-## 安装方式
+## Four-Layer Framework
 
-把本项目放在目标仓库根目录，并保留 `.agents/skills/human-readable-document-workflow/` 结构。Codex 在该仓库工作时即可读取项目级 skill。
+1. Writing workflow:
+   intake, frame, plan, draft, critique, revise, normalize, finalize.
+   Main file: `references/01-writing-loop.md`.
 
-PowerShell 示例：
+2. Human-readable style and anti-AI:
+   keep prose concrete, source-bounded, and non-template.
+   Main files: `references/02-human-readable-style.md`,
+   `references/03-anti-ai-slop-zh.md`,
+   `references/04-anti-ai-slop-en.md`.
+
+3. Document structure:
+   route by document type instead of applying one generic outline.
+   Main files: `references/05-academic-writing.md`,
+   `references/12-document-type-profiles.md`.
+
+4. Rendering and layout:
+   keep Markdown source renderable to Word/PDF when requested.
+   Main files: `references/06-document-layout.md`,
+   `references/07-markdown-authoring.md`,
+   `references/08-word-export.md`,
+   `references/09-pdf-export.md`.
+
+## Install To Repo Scope
+
+Copy `.agents` into the repository where Codex should discover the skill.
 
 ```powershell
-cd C:\path\to\your-repo
-Copy-Item -Recurse -Force .\human-readable-doc-skills\.agents .\.agents
+cd C:\path\to\target-repo
+Copy-Item -Recurse -Force D:\human-readable-doc-skills\.agents .\.agents
 Get-ChildItem .\.agents\skills\human-readable-document-workflow
 ```
 
-如果你的 Codex 环境只加载全局 skills，可以把 skill 文件夹复制到用户级目录：
+## Install To User Scope
+
+Use this when your Codex setup loads user-level skills.
 
 ```powershell
+$source = "D:\human-readable-doc-skills\.agents\skills\human-readable-document-workflow"
 $target = "$env:USERPROFILE\.codex\skills\human-readable-document-workflow"
-Copy-Item -Recurse -Force .\.agents\skills\human-readable-document-workflow $target
+Copy-Item -Recurse -Force $source $target
 ```
 
-## 调用方式
-
-显式调用：
+## Explicit Invocation
 
 ```text
-$human-readable-document-workflow 帮我写一份技术设计文档，输出 Markdown，后续转 Word 和 PDF。
+$human-readable-document-workflow 帮我写一份 PDF 预处理架构技术设计文档，输出 Markdown，后续转 Word 和 PDF。
 ```
 
-隐式触发：当用户请求创建、撰写、整理、润色、结构化、导出、排版文档、报告、论文、方案书、README、会议纪要、邮件、Word 或 PDF 时，`SKILL.md` 的 description 会引导 Codex 使用该 skill。短聊天回答默认不触发，除非用户明确要求可复用文档。
+## Implicit Triggering
 
-## 维护 References
+The skill should trigger when the user asks to create, draft, revise, polish,
+structure, export, typeset, or generate a reusable document. Typical signals
+include document, report, article, paper, proposal, README, Word, PDF, academic
+writing, technical documentation, business document, meeting notes, and email.
 
-- `SKILL.md` 只保留总控流程和加载指引。
-- 写作循环规则放在 `references/01-writing-loop.md`。
-- 中文去 AI 腔规则放在 `references/03-anti-ai-slop-zh.md`。
-- 英文去 AI 腔规则放在 `references/04-anti-ai-slop-en.md`。
-- 学术、Markdown、Word、PDF 和质量门禁分别维护在对应 reference 文件中。
+Short casual answers and code-only tasks should not trigger it unless the user
+explicitly asks for a reusable document artifact.
 
-新增规则时，优先放进已有主题文件；只有出现稳定的新主题时才新增 reference 文件。
+## Maintain References
 
-## 替换 Word 和 PDF 模板
+- Keep `SKILL.md` as the orchestration layer.
+- Put long-form rules in `references/`.
+- Keep each reference focused on one topic.
+- Add a new reference only when a stable topic would otherwise bloat another
+  file.
+- Keep upstream attribution in both `README.md` and
+  `references/11-upstream-attribution.md`.
 
-`assets/reference.docx` 是 Word 样式模板占位。实际使用时，用你自己的 Word 模板替换它，保留同名路径即可。
+## Maintain Scripts
 
-Pandoc 转 Word：
+Scripts live in:
+
+```text
+.agents\skills\human-readable-document-workflow\scripts
+```
+
+Rules:
+
+- Use Python standard library first.
+- Provide `argparse` CLIs and working `--help`.
+- Prefer JSON output for automation.
+- Keep conservative fixes separate from lint findings.
+- Protect Markdown frontmatter, code fences, tables, URLs, quotes, citations,
+  and bibliography entries during style cleanup.
+
+## Replace The Word Template
+
+`assets/reference.docx` is the Word reference document path used by the Pandoc
+wrapper. Replace it with your own template when production styling matters.
+
+```powershell
+Copy-Item -Force C:\path\to\your-template.docx `
+  .\.agents\skills\human-readable-document-workflow\assets\reference.docx
+```
+
+Render Word:
 
 ```powershell
 python .\.agents\skills\human-readable-document-workflow\scripts\render_with_pandoc.py `
@@ -68,87 +148,91 @@ python .\.agents\skills\human-readable-document-workflow\scripts\render_with_pan
   --reference-doc .\.agents\skills\human-readable-document-workflow\assets\reference.docx
 ```
 
-PDF 可以走 Pandoc、Quarto 或 Typst。项目提供 `assets/templates/report.typ` 和 `assets/quarto/_quarto.yml` 作为可扩展占位，默认不追求复杂版式。
+## Configure PDF Routes
 
-## 脚本用法
+The PDF layer supports three routes:
 
-检测用户请求是否为文档任务：
-
-```powershell
-python .\.agents\skills\human-readable-document-workflow\scripts\detect_doc_intent.py "帮我写一份技术设计文档，输出 Markdown"
-```
-
-检查 AI 腔：
-
-```powershell
-python .\.agents\skills\human-readable-document-workflow\scripts\lint_ai_style.py .\draft.md
-```
-
-规范化 Markdown：
-
-```powershell
-python .\.agents\skills\human-readable-document-workflow\scripts\normalize_markdown.py .\draft.md --output .\draft.normalized.md
-```
-
-渲染输出：
-
-```powershell
-python .\.agents\skills\human-readable-document-workflow\scripts\render_with_pandoc.py .\draft.md --to docx --output .\draft.docx
-```
-
-验证交付物：
-
-```powershell
-python .\.agents\skills\human-readable-document-workflow\scripts\validate_outputs.py .\draft.md .\draft.docx --markdown .\draft.md --pretty
-```
-
-所有脚本只使用 Python 标准库。
-
-## Attribution And License Notes
-
-本项目的方法论只参考下面列出的真实上游项目。规则内容为重新组织和重写的工作流方法，不直接复制第三方项目的受版权保护长文本。若后续引入特定开源项目的模板、代码或大段规则，应在本节补充许可证、来源链接和改动说明。
-
-已在 2026-06-21 通过 `http://127.0.0.1:10808` 代理检查可访问性：
-
-| Project | URL | Status |
+| Route | Command family | Use when |
 | --- | --- | --- |
-| Writer's Loop repo | https://github.com/xxsang/writers-loop | available |
-| Writer's Loop skill | https://github.com/xxsang/writers-loop/tree/main/skills/writers-loop | available |
-| codex-be-serious repo | https://github.com/lulucatdev/codex-be-serious | available |
-| codex-be-serious main skill | https://github.com/lulucatdev/codex-be-serious/tree/main/skills/be-serious | available |
-| codex-be-serious review skill | https://github.com/lulucatdev/codex-be-serious/tree/main/skills/be-serious-review | available |
-| unslop repo | https://github.com/MohamedAbdallah-14/unslop | available |
-| unslop main skill | https://github.com/MohamedAbdallah-14/unslop/tree/main/skills/unslop | available |
-| unslop humanize skill | https://github.com/MohamedAbdallah-14/unslop/tree/main/skills/humanize | unavailable, 404 on 2026-06-21 |
-| unslop review skill | https://github.com/MohamedAbdallah-14/unslop/tree/main/skills/unslop-review | available |
-| anti-slop-writing repo | https://github.com/adenaufal/anti-slop-writing | available |
-| anti-slop-writing English directory | https://github.com/adenaufal/anti-slop-writing/tree/main/english | available |
-| anti-slop-writing English SKILL.md | https://github.com/adenaufal/anti-slop-writing/blob/main/english/SKILL.md | available |
-| qu-ai-wei repo | https://github.com/LifelongLazyLearner/qu-ai-wei | available |
-| qu-ai-wei SKILL.md | https://github.com/LifelongLazyLearner/qu-ai-wei/blob/main/SKILL.md | available |
-| qu-ai-wei references | https://github.com/LifelongLazyLearner/qu-ai-wei/tree/main/references | available |
-| qu-ai-wei scripts | https://github.com/LifelongLazyLearner/qu-ai-wei/tree/main/scripts | available |
-| Humanizer-zh repo | https://github.com/op7418/humanizer-zh | available |
-| Humanizer-zh SKILL.md | https://github.com/op7418/humanizer-zh/blob/main/SKILL.md | available |
-| writing-humanizer repo | https://github.com/shyuan/writing-humanizer | available |
-| writing-humanizer skill | https://github.com/shyuan/writing-humanizer/tree/main/skills/writing-humanizer | available |
-| prompts.chat repo | https://github.com/f/prompts.chat | available |
-| ChatGPT Prompts for Academic Writing repo | https://github.com/ahmetbersoz/chatgpt-prompts-for-academic-writing | available |
+| Pandoc | `render_with_pandoc.py --to pdf` | General Markdown to PDF. |
+| Quarto | `quarto render` | Computational reports or Quarto projects. |
+| Typst | `typst compile` | Typst-native layouts. |
 
-Do not invent replacement paths for unavailable entries. Use the remaining verified references or mark the missing path explicitly.
+If the renderer is unavailable, deliver clean Markdown and the command needed to
+render locally. Do not claim a PDF exists unless a command created it.
 
-License metadata checked through the GitHub API on 2026-06-21 via the same proxy:
+## Validation
 
-| Project | GitHub license metadata |
-| --- | --- |
-| Writer's Loop | MIT |
-| codex-be-serious | MIT |
-| unslop | MIT |
-| anti-slop-writing | MIT |
-| qu-ai-wei | MIT |
-| Humanizer-zh | MIT |
-| writing-humanizer | MIT |
-| prompts.chat | Other / NOASSERTION |
-| ChatGPT Prompts for Academic Writing | unknown |
+Run the skill package validator:
 
-Treat this table as metadata, not legal advice. If you copy code, templates, or long text from an upstream project later, re-check that repository's license file and preserve the required notice.
+```powershell
+python .\.agents\skills\human-readable-document-workflow\scripts\validate_skill.py --pretty
+```
+
+Run routing:
+
+```powershell
+python .\.agents\skills\human-readable-document-workflow\scripts\detect_doc_intent.py `
+  --file .\tests\fixtures\doc-intent-technical-zh.txt --pretty
+```
+
+Run style lint:
+
+```powershell
+python .\.agents\skills\human-readable-document-workflow\scripts\lint_ai_style.py `
+  .\tests\fixtures\ai-slop-zh.md --pretty
+```
+
+Run Markdown checks:
+
+```powershell
+python .\.agents\skills\human-readable-document-workflow\scripts\normalize_markdown.py `
+  .\tests\fixtures\bad-markdown.md --check --report .\tmp\markdown-report.json
+```
+
+## Upstream Projects
+
+This repository uses the following upstream projects as methodology references
+only. Rules and scripts in this repository are rewritten locally.
+
+| Project | URL | License note |
+| --- | --- | --- |
+| Writer's Loop | https://github.com/xxsang/writers-loop | GitHub metadata previously observed as MIT. |
+| Writer's Loop skill | https://github.com/xxsang/writers-loop/tree/main/skills/writers-loop | Methodology reference only. |
+| codex-be-serious | https://github.com/lulucatdev/codex-be-serious | GitHub metadata previously observed as MIT. |
+| codex-be-serious main skill | https://github.com/lulucatdev/codex-be-serious/tree/main/skills/be-serious | Methodology reference only. |
+| codex-be-serious review skill | https://github.com/lulucatdev/codex-be-serious/tree/main/skills/be-serious-review | Methodology reference only. |
+| unslop | https://github.com/MohamedAbdallah-14/unslop | GitHub metadata previously observed as MIT. |
+| unslop main skill | https://github.com/MohamedAbdallah-14/unslop/tree/main/skills/unslop | Methodology reference only. |
+| unslop review skill | https://github.com/MohamedAbdallah-14/unslop/tree/main/skills/unslop-review | Methodology reference only. |
+| anti-slop-writing | https://github.com/adenaufal/anti-slop-writing | GitHub metadata previously observed as MIT. |
+| anti-slop-writing English directory | https://github.com/adenaufal/anti-slop-writing/tree/main/english | Methodology reference only. |
+| anti-slop-writing English SKILL.md | https://github.com/adenaufal/anti-slop-writing/blob/main/english/SKILL.md | Methodology reference only. |
+| qu-ai-wei | https://github.com/LifelongLazyLearner/qu-ai-wei | GitHub metadata previously observed as MIT. |
+| qu-ai-wei SKILL.md | https://github.com/LifelongLazyLearner/qu-ai-wei/blob/main/SKILL.md | Methodology reference only. |
+| qu-ai-wei references | https://github.com/LifelongLazyLearner/qu-ai-wei/tree/main/references | Methodology reference only. |
+| qu-ai-wei scripts | https://github.com/LifelongLazyLearner/qu-ai-wei/tree/main/scripts | Methodology reference only. |
+| Humanizer-zh | https://github.com/op7418/humanizer-zh | GitHub metadata previously observed as MIT. |
+| Humanizer-zh SKILL.md | https://github.com/op7418/humanizer-zh/blob/main/SKILL.md | Methodology reference only. |
+| writing-humanizer | https://github.com/shyuan/writing-humanizer | GitHub metadata previously observed as MIT. |
+| writing-humanizer skill | https://github.com/shyuan/writing-humanizer/tree/main/skills/writing-humanizer | Methodology reference only. |
+| prompts.chat | https://github.com/f/prompts.chat | GitHub metadata previously observed as Other / NOASSERTION. |
+| ChatGPT Prompts for Academic Writing | https://github.com/ahmetbersoz/chatgpt-prompts-for-academic-writing | License metadata previously observed as unknown. |
+
+Do not invent unavailable paths. The requested `unslop` path
+`skills/humanize` is treated as unavailable unless verified later.
+
+## License Notes
+
+This repository does not vendor upstream repositories. If future work copies
+code, templates, long examples, or protected text from an upstream project,
+re-check that project's license file, preserve required notices, and document
+the import in `references/11-upstream-attribution.md`.
+
+## Roadmap
+
+- Add more document profiles only when repeated tasks justify them.
+- Add renderer-specific templates after real user documents expose layout needs.
+- Add optional forward tests using realistic document prompts.
+- Add stricter validation for citations and bibliography files when a citation
+  workflow is introduced.

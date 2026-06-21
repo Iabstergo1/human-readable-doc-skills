@@ -1,45 +1,77 @@
 # Routing Policy
 
-## Trigger This Skill
+Use this file to decide whether the document workflow should run, how to choose
+a document type, and which references to load first.
 
-Use this skill when the user asks to create, draft, revise, polish, structure, format, export, typeset, or generate a reusable document or long-form written artifact.
+## Trigger Scope
 
-Common triggers include:
+Trigger when the user asks for a reusable written artifact rather than a short
+chat answer.
 
-- Chinese: 写、撰写、生成、整理、润色、排版、导出、报告、论文、方案、说明书、会议纪要、简历、邮件、Markdown、Word、PDF。
-- English: write, draft, generate, revise, polish, structure, export, typeset, report, paper, proposal, manual, README, meeting notes, email, Markdown, Word, PDF.
+| Signal group | Common triggers | Route |
+| --- | --- | --- |
+| Creation | 写, 撰写, 生成, draft, write, generate | Run intake and profile selection. |
+| Revision | 润色, 改写, polish, revise, humanize | Preserve source facts and run style checks. |
+| Structure | 结构化, 大纲, organize, outline | Load the document type profile before drafting. |
+| Export | Word, docx, PDF, Markdown, render, typeset | Treat Markdown as canonical source. |
+| Validation | 检查, 质量, lint, validate | Run deterministic scripts when a file exists. |
 
 ## Do Not Trigger
 
-Do not use this skill for:
+Do not trigger for tasks whose primary deliverable is not a document.
 
-- Short casual answers.
-- One-line rewrites with no document intent.
-- Code-only tasks where the deliverable is source code, not a document.
-- Data analysis where the user wants only a calculation or chart, not a written artifact.
-- Slide decks unless the user asks for the written source, speaker notes, or document-like narrative.
+| Non-trigger | Boundary |
+| --- | --- |
+| Short answer | A one-paragraph explanation does not need this skill. |
+| Code implementation | Use normal coding workflow unless the user asks for docs. |
+| Data calculation | Use this skill only when a written report is requested. |
+| Slide design | Use this skill only for speaker notes or document-like source. |
+| Translation only | Use this skill only if the result needs document structure. |
 
 ## Document Type Mapping
 
+Prefer the more specific type when multiple signals appear. Use
+`references/12-document-type-profiles.md` for full profile rules.
+
 | Signals | Type |
 | --- | --- |
-| architecture, API, design doc, 技术设计, 接口, 部署 | `technical` |
-| paper, thesis, literature, citation, 论文, 学术, 文献 | `academic` |
-| business, memo, market, strategy, 商业, 经营, 汇报 | `business` |
-| proposal, plan, project plan, 方案, 计划书 | `proposal` |
-| manual, guide, SOP, instructions, 说明书, 手册 | `manual` |
-| README, repo docs, installation, usage | `README` |
-| meeting, minutes, action items, 会议纪要 | `meeting-notes` |
-| email, message, outreach, 邮件, 通知 | `email` |
-| no strong signal | `general` |
+| architecture, design doc, 技术设计, 架构, 接口, 数据流 | `technical-design` |
+| README, repo docs, installation, usage, 项目主页 | `README` |
+| paper, thesis, 论文, 模型, 变量, citation | `academic-paper` |
+| literature review, 文献综述, 研究现状 | `literature-review` |
+| business report, 汇报, 经营分析, market | `business-report` |
+| proposal, 方案, 计划书, grant, pitch | `proposal` |
+| manual, SOP, 操作手册, 指南, runbook | `manual / SOP` |
+| meeting notes, 会议纪要, action items | `meeting-notes` |
+| email, 邮件, 通知, outreach | `email` |
+| article, blog, 文章, no strong signal | `general-article` |
 
 ## Format Defaults
 
-- If the user only says "帮我写个文档", default to Markdown.
-- If the user asks for Word or PDF, first create structured Markdown source, then provide or run the rendering path.
-- If the user asks for chat-only output, keep the answer concise but still apply the writing loop internally.
-- If the user gives no language, infer from the request and source material.
+| Request | Default |
+| --- | --- |
+| No format specified | Markdown. |
+| Word requested | Markdown source plus `.docx` render path or artifact. |
+| PDF requested | Markdown source plus PDF render path or artifact. |
+| Word and PDF requested | One Markdown source, then render both artifacts. |
+| Chat-only requested | Concise answer, with internal fact-boundary checks. |
 
-## Clarification Policy
+## Examples
 
-Ask only when missing information would materially change the document. Otherwise, state the assumption and proceed.
+User: "帮我写一份 PDF 预处理架构技术设计文档，输出 Markdown。"
+
+Route: document task, `technical-design`, `zh-CN`, `Markdown`; load routing,
+writing loop, readability, Chinese anti-slop, layout, Markdown, quality gates,
+and document type profiles.
+
+User: "这个变量名怎么改？"
+
+Route: not a document task unless the user asks for a style guide or README
+update.
+
+## Boundaries
+
+Ask a clarification only when the missing answer changes the document itself:
+audience, required format, source material, citation source, legal/medical risk,
+or whether a public-facing document may mention private facts. Otherwise state a
+reasonable assumption and continue.
