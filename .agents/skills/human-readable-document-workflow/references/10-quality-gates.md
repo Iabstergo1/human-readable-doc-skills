@@ -13,7 +13,7 @@ and renderable.
 | Structure | Headings, sections, and order match the document type. | `normalize_markdown.py`. |
 | Style | Obvious AI phrasing is removed without casualizing precise text. | `lint_ai_style.py`. |
 | Markdown | Source is raw-readable and renderable. | `normalize_markdown.py`. |
-| Output artifacts | Requested files exist and have plausible file structure. | `validate_outputs.py`. |
+| Output artifacts | Explicitly requested files exist and have plausible file structure. | `validate_outputs.py`. |
 
 ## Goal And Reader
 
@@ -56,11 +56,15 @@ Non-goal: not a user-facing product overview.
 
 ## Output Path
 
+Apply Word and PDF checks only when the user explicitly asks for those exported
+artifacts. A task about PDF content, PDF preprocessing, or Word-related prose is
+not automatically a PDF or Word export request.
+
 | Requested output | Required evidence |
 | --- | --- |
 | Markdown | Source file or Markdown text passes readability checks. |
-| Word | Markdown source exists and `.docx` is rendered or command is provided. |
-| PDF | Markdown source exists and `.pdf` is rendered or command is provided. |
+| Word, explicitly requested | Markdown source exists and `.docx` is rendered or command is provided. |
+| PDF, explicitly requested | Markdown source exists and `.pdf` is rendered or command is provided. |
 | Word plus PDF | One canonical Markdown source drives both artifacts. |
 
 ## Suggested Commands

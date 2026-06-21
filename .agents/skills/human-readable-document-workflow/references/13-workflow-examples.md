@@ -5,11 +5,13 @@ They are routing examples, not templates to copy verbatim into user output.
 
 ## Example 1: PDF Preprocessing Technical Design
 
-User request:
+### User Request
 
 ```text
 帮我写一份 PDF 预处理架构技术设计文档，输出 Markdown，后续转 Word 和 PDF。
 ```
+
+### Detection
 
 | Field | Detected value |
 | --- | --- |
@@ -19,7 +21,7 @@ User request:
 | language | `zh-CN` |
 | needs Markdown source | `true` |
 
-References to load:
+### References To Load
 
 - `references/00-routing-policy.md`
 - `references/01-writing-loop.md`
@@ -32,16 +34,15 @@ References to load:
 - `references/10-quality-gates.md`
 - `references/12-document-type-profiles.md`
 
-Scripts to run if file-based:
+### Scripts To Run If File-Based
 
 - `detect_doc_intent.py --pretty`
 - `normalize_markdown.py --check --report`
 - `validate_outputs.py --markdown`
 
-Expected output shape:
+### Expected Output Shape
 
 ```markdown
-
 # PDF 预处理架构技术设计
 
 ## 背景与问题
@@ -61,16 +62,17 @@ Expected output shape:
 ## 验证计划
 
 ## 风险与下一步
-
 ```
 
 ## Example 2: Chinese AI-Style Report Revision
 
-User request:
+### User Request
 
 ```text
 把这段 AI 味很重的中文报告润色成人类更容易读懂的版本。
 ```
+
+### Detection
 
 | Field | Detected value |
 | --- | --- |
@@ -80,7 +82,7 @@ User request:
 | language | `zh-CN` |
 | needs Markdown source | `false` unless file-based or reusable output requested. |
 
-References to load:
+### References To Load
 
 - `references/00-routing-policy.md`
 - `references/01-writing-loop.md`
@@ -89,23 +91,25 @@ References to load:
 - `references/10-quality-gates.md`
 - `references/12-document-type-profiles.md`
 
-Scripts to run if file-based:
+### Scripts To Run If File-Based
 
 - `lint_ai_style.py input.md --format json --pretty`
 - `normalize_markdown.py input.md --check --report .\tmp\markdown-report.json`
 
-Expected output shape:
+### Expected Output Shape
 
 - Revised text.
 - Short note on preserved facts and any unsupported claims left unresolved.
 
 ## Example 3: Academic Model Explanation
 
-User request:
+### User Request
 
 ```text
 帮我生成一篇学术论文第三章的模型说明，注意符号统一。
 ```
+
+### Detection
 
 | Field | Detected value |
 | --- | --- |
@@ -115,7 +119,7 @@ User request:
 | language | `zh-CN` |
 | needs Markdown source | `true` |
 
-References to load:
+### References To Load
 
 - `references/00-routing-policy.md`
 - `references/01-writing-loop.md`
@@ -126,15 +130,14 @@ References to load:
 - `references/10-quality-gates.md`
 - `references/12-document-type-profiles.md`
 
-Scripts to run if file-based:
+### Scripts To Run If File-Based
 
 - `normalize_markdown.py --check --report`
 - `validate_outputs.py --markdown`
 
-Expected output shape:
+### Expected Output Shape
 
 ```markdown
-
 # 第三章 模型设定
 
 ## 概念界定
@@ -150,16 +153,17 @@ Expected output shape:
 ## 机制解释
 
 ## 局限与待补充来源
-
 ```
 
 ## Example 4: GitHub README Rewrite
 
-User request:
+### User Request
 
 ```text
 把 README 写得更清楚，适合 GitHub 项目主页。
 ```
+
+### Detection
 
 | Field | Detected value |
 | --- | --- |
@@ -169,7 +173,7 @@ User request:
 | language | Infer from source or user request. |
 | needs Markdown source | `true` |
 
-References to load:
+### References To Load
 
 - `references/00-routing-policy.md`
 - `references/01-writing-loop.md`
@@ -179,15 +183,14 @@ References to load:
 - `references/10-quality-gates.md`
 - `references/12-document-type-profiles.md`
 
-Scripts to run if file-based:
+### Scripts To Run If File-Based
 
 - `normalize_markdown.py README.md --check --report .\tmp\readme-report.json`
 - `lint_ai_style.py README.md --format json --pretty`
 
-Expected output shape:
+### Expected Output Shape
 
 ```markdown
-
 # Project Name
 
 ## What This Solves
@@ -205,16 +208,17 @@ Expected output shape:
 ## Limitations
 
 ## License
-
 ```
 
 ## Example 5: Meeting Notes
 
-User request:
+### User Request
 
 ```text
 输出一份会议纪要，包含决策、风险和 action items。
 ```
+
+### Detection
 
 | Field | Detected value |
 | --- | --- |
@@ -224,7 +228,7 @@ User request:
 | language | Mixed if the user wants `action items` retained. |
 | needs Markdown source | `true` for reusable notes. |
 
-References to load:
+### References To Load
 
 - `references/00-routing-policy.md`
 - `references/01-writing-loop.md`
@@ -234,15 +238,14 @@ References to load:
 - `references/10-quality-gates.md`
 - `references/12-document-type-profiles.md`
 
-Scripts to run if file-based:
+### Scripts To Run If File-Based
 
 - `normalize_markdown.py --check --report`
 - `validate_outputs.py --markdown`
 
-Expected output shape:
+### Expected Output Shape
 
 ```markdown
-
 # 会议纪要
 
 ## 背景
@@ -254,7 +257,6 @@ Expected output shape:
 ## Action Items
 
 ## Open Questions
-
 ```
 
 ## Boundaries

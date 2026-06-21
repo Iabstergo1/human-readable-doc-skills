@@ -2,19 +2,37 @@
 
 This repository provides a Codex skill for document generation and revision. It
 turns broad requests such as "write a technical design", "polish this report",
-"export to Word/PDF", or "make this README clearer" into a controlled workflow:
-route the document type, load focused references, produce Markdown as the source
-of truth, and verify the result before delivery.
+or "make this README clearer" into a controlled workflow: route the document
+type, load focused references, produce Markdown as the source of truth, and
+verify the result before delivery.
 
-## What This Solves
+## Core Capability
 
 - Keeps `SKILL.md` small while giving Codex deeper rules through references.
 - Separates writing workflow, human-readable style, document structure, and
-  rendering/layout rules.
+  Markdown layout rules.
 - Provides standard-library scripts for deterministic checks.
-- Treats Markdown as the canonical source for Word and PDF outputs.
+- Treats Markdown as the canonical source for substantial document work.
 - Preserves attribution for methodology references without vendoring upstream
   projects.
+
+The core skill is a human-readable document workflow. It improves planning,
+drafting, revision, structure, Markdown authoring, style review, and final
+quality checks. It is not a full Word or PDF rendering system.
+
+## Optional Export Adapter
+
+Word and PDF support are optional adapters used only when the user explicitly
+requests those artifacts. The skill first creates or updates Markdown, then
+renders through local tools when available or provides a reproducible command
+when they are not.
+
+- Word output uses `references/08-word-export.md`,
+  `assets/reference.docx`, and `render_with_pandoc.py`.
+- PDF output uses `references/09-pdf-export.md` and local routes such as
+  Pandoc, Quarto, or Typst.
+- Markdown-only tasks should not load Word or PDF export rules.
+- Do not claim a `.docx` or `.pdf` exists unless a command created it.
 
 ## What This Does Not Solve
 
@@ -61,7 +79,8 @@ human-readable-doc-skills/
    `references/12-document-type-profiles.md`.
 
 4. Rendering and layout:
-   keep Markdown source renderable to Word/PDF when requested.
+   keep Markdown source readable and renderable; load Word/PDF export guidance
+   only when those artifacts are explicitly requested.
    Main files: `references/06-document-layout.md`,
    `references/07-markdown-authoring.md`,
    `references/08-word-export.md`,
@@ -132,6 +151,7 @@ Rules:
 
 ## Replace The Word Template
 
+This section applies only to explicit Word export requests.
 `assets/reference.docx` is the Word reference document path used by the Pandoc
 wrapper. Replace it with your own template when production styling matters.
 
@@ -150,7 +170,8 @@ python .\.agents\skills\human-readable-document-workflow\scripts\render_with_pan
 
 ## Configure PDF Routes
 
-The PDF layer supports three routes:
+This section applies only to explicit PDF export requests. The PDF layer
+supports three routes:
 
 | Route | Command family | Use when |
 | --- | --- | --- |

@@ -204,6 +204,30 @@ def protected_lines(text: str) -> set[int]:
     return protected
 
 
+def should_skip_rule(rule: Rule, line: str) -> bool:
+    if rule.id == "zh-mechanical-transition":
+        has_order_marker = re.search(r"首先|其次|最后", line)
+        has_ordered_context = re.search(
+            r"令|表示|定义|变量|假设|模型|命题|证明|步骤|阶段|流程|procedure|step",
+            line,
+            flags=re.IGNORECASE,
+        )
+        if has_order_marker and has_ordered_context:
+            return True
+
+    if rule.id == "zh-false-depth":
+        is_boundary_contrast = re.search(r"不是.{0,24}而是", line)
+        has_boundary_context = re.search(
+            r"目标|非目标|定义|边界|输入|输出|数据|记录|变量|模型|状态|schema|任务|职责",
+            line,
+            flags=re.IGNORECASE,
+        )
+        if is_boundary_contrast and has_boundary_context:
+            return True
+
+    return False
+
+
 def lint_text(text: str, min_severity: str = "info") -> list[dict[str, object]]:
     issues: list[dict[str, object]] = []
     protected = protected_lines(text)
@@ -213,6 +237,8 @@ def lint_text(text: str, min_severity: str = "info") -> list[dict[str, object]]:
             continue
         for rule in RULES:
             if SEVERITY_ORDER[rule.severity] < threshold:
+                continue
+            if should_skip_rule(rule, line):
                 continue
             if re.search(rule.pattern, line, flags=re.IGNORECASE):
                 issues.append(

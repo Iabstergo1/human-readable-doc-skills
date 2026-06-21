@@ -5,9 +5,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -167,13 +169,17 @@ def check_script_help(script: Path) -> dict[str, object]:
 
 
 def py_compile_script(script: Path) -> dict[str, object]:
-    completed = subprocess.run(
-        [sys.executable, "-m", "py_compile", str(script)],
-        text=True,
-        capture_output=True,
-        check=False,
-        timeout=15,
-    )
+    with tempfile.TemporaryDirectory(prefix="hrdw-pycache-") as pycache_dir:
+        env = os.environ.copy()
+        env["PYTHONPYCACHEPREFIX"] = pycache_dir
+        completed = subprocess.run(
+            [sys.executable, "-m", "py_compile", str(script)],
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=15,
+            env=env,
+        )
     return {
         "script": script.name,
         "returncode": completed.returncode,

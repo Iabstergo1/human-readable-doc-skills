@@ -52,8 +52,8 @@ Read only the references needed for the current task:
 - Academic writing: `references/05-academic-writing.md`
 - Layout rules: `references/06-document-layout.md`
 - Markdown source rules: `references/07-markdown-authoring.md`
-- Word export: `references/08-word-export.md`
-- PDF export: `references/09-pdf-export.md`
+- Word export: `references/08-word-export.md` only when explicitly requested.
+- PDF export: `references/09-pdf-export.md` only when explicitly requested.
 - Final checks: `references/10-quality-gates.md`
 - Upstream attribution: `references/11-upstream-attribution.md`
 - Document type profiles: `references/12-document-type-profiles.md`
@@ -82,17 +82,18 @@ do not skip fact-boundary checks.
 
 4. **Rendering and layout layer**
    Load `references/06-document-layout.md`,
-   `references/07-markdown-authoring.md`, and the export references needed for
-   the requested artifacts:
+   `references/07-markdown-authoring.md`, and only the export references
+   explicitly requested for the artifacts:
    `references/08-word-export.md` for Word,
    `references/09-pdf-export.md` for PDF.
 
 ## Markdown Source Rule
 
-Markdown is the canonical source for substantial documents. If the user asks for
-Word or PDF, first produce or update a clean Markdown source draft, then render
-or provide the render command. Do not treat `.docx` or `.pdf` as formats the
-model should fake directly.
+Markdown is the canonical source for substantial documents. Word and PDF are
+optional export adapters, not the core capability. If the user explicitly asks
+for Word or PDF, first produce or update a clean Markdown source draft, then
+render or provide the render command. Do not treat `.docx` or `.pdf` as formats
+the model should fake directly.
 
 ## Script Use
 
@@ -121,8 +122,8 @@ Before final delivery, load `references/10-quality-gates.md` and verify:
 - The prose is readable without forced casualness or obvious AI patterns.
 - Markdown is renderable, with stable headings, tables, code blocks, captions,
   formulas, and links.
-- Word/PDF requests have a Markdown source and either a rendered artifact or a
-  clear local render command.
+- Explicit Word/PDF export requests have a Markdown source and either a rendered
+  artifact or a clear local render command.
 
 In the final answer, provide the artifact path, rendered output, or concise
 summary the user needs. Do not expose the internal critique trace unless asked.

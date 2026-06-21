@@ -20,19 +20,55 @@ Each profile defines structure, tone, references, export notes, and boundaries.
 
 ## Technical Design
 
-| Field | Guidance |
-| --- | --- |
-| Trigger keywords | 技术设计, 架构, architecture, design doc, API, pipeline, data flow, error handling. |
-| Recommended structure | Use the outline below. |
-| Default tone | Direct, concrete, implementation-oriented. |
-| References to load | 00, 01, 02, language anti-slop, 06, 07, 08/09 if export requested, 10, 12. |
-| Do not | Add marketing claims, skip failure modes, hide assumptions, use diagrams without explanation. |
-| Markdown/Word/PDF notes | Prefer Markdown source with tables for I/O and risks; code blocks need language labels; Word/PDF should render from the same source. |
+### Trigger Keywords
 
-Example outline:
+技术设计, 架构, architecture, design doc, API, pipeline, data flow,
+error handling.
+
+### Recommended Structure
+
+- Background and problem.
+- Goals and non-goals.
+- Inputs and outputs.
+- Architecture and data flow.
+- Processing flow.
+- Error handling.
+- Performance and scalability.
+- Validation plan.
+- Risks and next steps.
+
+### Default Tone
+
+Direct, concrete, implementation-oriented.
+
+### References To Load
+
+- `references/00-routing-policy.md`
+- `references/01-writing-loop.md`
+- `references/02-human-readable-style.md`
+- Language-specific anti-slop reference.
+- `references/06-document-layout.md`
+- `references/07-markdown-authoring.md`
+- `references/08-word-export.md` only when Word export is explicitly requested.
+- `references/09-pdf-export.md` only when PDF export is explicitly requested.
+- `references/10-quality-gates.md`
+- `references/12-document-type-profiles.md`
+
+### Do Not
+
+- Add marketing claims.
+- Skip failure modes.
+- Hide assumptions.
+- Use diagrams without explanation.
+
+### Markdown And Export Notes
+
+Prefer Markdown source with tables for I/O and risks. Code blocks need language
+labels. Word and PDF should render from the same source only when requested.
+
+### Example Outline
 
 ```markdown
-
 # PDF Preprocessing Architecture
 
 ## Background And Problem
@@ -52,7 +88,6 @@ Example outline:
 ## Validation Plan
 
 ## Risks And Next Steps
-
 ```
 
 Structure notes:
@@ -68,19 +103,51 @@ Structure notes:
 
 ## README
 
-| Field | Guidance |
-| --- | --- |
-| Trigger keywords | README, repo docs, GitHub 项目主页, installation, usage, quickstart. |
-| Recommended structure | What it is; what problem it solves; installation; quick start; examples; configuration; tests; limitations; roadmap; license/attribution. |
-| Default tone | Practical, concise, project-facing. |
-| References to load | 00, 01, 02, 04 for English or 03 for Chinese, 07, 10, 12. |
-| Do not | Turn README into a sales page, omit setup commands, bury limitations. |
-| Markdown/Word/PDF notes | Markdown is usually the final format; tables must render on GitHub. |
+### Trigger Keywords
 
-Example outline:
+README, repo docs, GitHub 项目主页, installation, usage, quickstart.
+
+### Recommended Structure
+
+- What it is.
+- What problem it solves.
+- Installation.
+- Quick start.
+- Examples.
+- Configuration.
+- Tests.
+- Limitations.
+- Roadmap.
+- License or attribution.
+
+### Default Tone
+
+Practical, concise, project-facing.
+
+### References To Load
+
+- `references/00-routing-policy.md`
+- `references/01-writing-loop.md`
+- `references/02-human-readable-style.md`
+- `references/04-anti-ai-slop-en.md` for English.
+- `references/03-anti-ai-slop-zh.md` for Chinese.
+- `references/07-markdown-authoring.md`
+- `references/10-quality-gates.md`
+- `references/12-document-type-profiles.md`
+
+### Do Not
+
+- Turn README into a sales page.
+- Omit setup commands.
+- Bury limitations.
+
+### Markdown And Export Notes
+
+Markdown is usually the final format. Tables must render cleanly on GitHub.
+
+### Example Outline
 
 ```markdown
-
 # Project Name
 
 ## What This Solves
@@ -98,24 +165,54 @@ Example outline:
 ## Attribution
 
 ## Roadmap
-
 ```
 
 ## Academic Paper
 
-| Field | Guidance |
-| --- | --- |
-| Trigger keywords | 论文, thesis, academic paper, model, variables, formula, citation. |
-| Recommended structure | Concept definitions; research question; literature position; method; model/variables/symbols; argument chain; limitations; citation placeholders. |
-| Default tone | Formal, precise, source-bounded. |
-| References to load | 00, 01, 02, 03/04, 05, 07, 10, 12. |
-| Do not | Invent literature, authors, years, journals, DOI, data, or findings. |
-| Markdown/Word/PDF notes | Use YAML frontmatter when useful; formulas need explanation; citations only from supplied sources or `[citation needed]`. |
+### Trigger Keywords
 
-Example outline:
+论文, thesis, academic paper, model, variables, formula, citation.
+
+### Recommended Structure
+
+- Concept definitions.
+- Research question.
+- Literature position.
+- Method.
+- Model, variables, and symbols.
+- Argument chain.
+- Limitations.
+- Citation placeholders.
+
+### Default Tone
+
+Formal, precise, source-bounded.
+
+### References To Load
+
+- `references/00-routing-policy.md`
+- `references/01-writing-loop.md`
+- `references/02-human-readable-style.md`
+- `references/03-anti-ai-slop-zh.md` or `references/04-anti-ai-slop-en.md`.
+- `references/05-academic-writing.md`
+- `references/07-markdown-authoring.md`
+- `references/10-quality-gates.md`
+- `references/12-document-type-profiles.md`
+
+### Do Not
+
+- Invent literature, authors, years, journals, DOI, data, or findings.
+- Flatten model logic into generic prose.
+- Remove necessary formal terms only to sound casual.
+
+### Markdown And Export Notes
+
+Use YAML frontmatter when useful. Formulas need explanation. Citations must come
+from supplied sources or remain as `[citation needed]`.
+
+### Example Outline
 
 ```markdown
-
 # Chapter 3 Model Specification
 
 ## Concept Definitions
@@ -131,24 +228,52 @@ Example outline:
 ## Expected Relationships
 
 ## Limitations
-
 ```
 
 ## Literature Review
 
-| Field | Guidance |
-| --- | --- |
-| Trigger keywords | 文献综述, literature review, research background, prior work. |
-| Recommended structure | Scope; search/source boundary; thematic map; methodological comparison; findings; gaps; relation to current work. |
-| Default tone | Synthetic, careful, non-inventive. |
-| References to load | 00, 01, 02, 05, 07, 10, 12. |
-| Do not | Pretend to have read papers not provided; fabricate citation clusters. |
-| Markdown/Word/PDF notes | Use tables only for real comparison; keep placeholders visible. |
+### Trigger Keywords
 
-Example outline:
+文献综述, literature review, research background, prior work.
+
+### Recommended Structure
+
+- Scope.
+- Search or source boundary.
+- Thematic map.
+- Methodological comparison.
+- Findings.
+- Gaps.
+- Relation to current work.
+
+### Default Tone
+
+Synthetic, careful, non-inventive.
+
+### References To Load
+
+- `references/00-routing-policy.md`
+- `references/01-writing-loop.md`
+- `references/02-human-readable-style.md`
+- `references/05-academic-writing.md`
+- `references/07-markdown-authoring.md`
+- `references/10-quality-gates.md`
+- `references/12-document-type-profiles.md`
+
+### Do Not
+
+- Pretend to have read papers not provided.
+- Fabricate citation clusters.
+- Treat a list of paper summaries as synthesis.
+
+### Markdown And Export Notes
+
+Use tables only for real comparisons. Keep placeholders visible when sources are
+missing.
+
+### Example Outline
 
 ```markdown
-
 # Literature Review
 
 ## Scope And Source Boundary
@@ -162,24 +287,53 @@ Example outline:
 ## Gaps
 
 ## Position Of This Study
-
 ```
 
 ## Business Report
 
-| Field | Guidance |
-| --- | --- |
-| Trigger keywords | business report, 汇报, 经营分析, 市场, strategy, memo. |
-| Recommended structure | Executive summary; context; findings; evidence; options; recommendation; risks; next actions. |
-| Default tone | Clear, decision-oriented, factual. |
-| References to load | 00, 01, 02, language anti-slop, 06, 07, 10, 12. |
-| Do not | Add unsupported market claims or generic growth language. |
-| Markdown/Word/PDF notes | Tables are useful for options, costs, risks, and owners. |
+### Trigger Keywords
 
-Example outline:
+business report, 汇报, 经营分析, 市场, strategy, memo.
+
+### Recommended Structure
+
+- Executive summary.
+- Context.
+- Findings.
+- Evidence.
+- Options.
+- Recommendation.
+- Risks.
+- Next actions.
+
+### Default Tone
+
+Clear, decision-oriented, factual.
+
+### References To Load
+
+- `references/00-routing-policy.md`
+- `references/01-writing-loop.md`
+- `references/02-human-readable-style.md`
+- Language-specific anti-slop reference.
+- `references/06-document-layout.md`
+- `references/07-markdown-authoring.md`
+- `references/10-quality-gates.md`
+- `references/12-document-type-profiles.md`
+
+### Do Not
+
+- Add unsupported market claims.
+- Use generic growth language.
+- Hide the decision the reader needs to make.
+
+### Markdown And Export Notes
+
+Tables are useful for options, costs, risks, and owners.
+
+### Example Outline
 
 ```markdown
-
 # Business Report
 
 ## Executive Summary
@@ -195,24 +349,55 @@ Example outline:
 ## Risks
 
 ## Next Actions
-
 ```
 
 ## Proposal
 
-| Field | Guidance |
-| --- | --- |
-| Trigger keywords | proposal, 方案, 计划书, project plan, grant, pitch. |
-| Recommended structure | Problem; goal; proposed approach; scope; timeline; resources; risks; expected outcomes; decision needed. |
-| Default tone | Persuasive but concrete. |
-| References to load | 00, 01, 02, language anti-slop, 06, 07, 10, 12. |
-| Do not | Overpromise impact, hide cost, or use vague benefit language. |
-| Markdown/Word/PDF notes | Word/PDF may be needed for stakeholder delivery; keep Markdown source. |
+### Trigger Keywords
 
-Example outline:
+proposal, 方案, 计划书, project plan, grant, pitch.
+
+### Recommended Structure
+
+- Problem.
+- Goal.
+- Proposed approach.
+- Scope.
+- Timeline.
+- Resources.
+- Risks.
+- Expected outcomes.
+- Decision needed.
+
+### Default Tone
+
+Persuasive but concrete.
+
+### References To Load
+
+- `references/00-routing-policy.md`
+- `references/01-writing-loop.md`
+- `references/02-human-readable-style.md`
+- Language-specific anti-slop reference.
+- `references/06-document-layout.md`
+- `references/07-markdown-authoring.md`
+- `references/10-quality-gates.md`
+- `references/12-document-type-profiles.md`
+
+### Do Not
+
+- Overpromise impact.
+- Hide cost.
+- Use vague benefit language.
+
+### Markdown And Export Notes
+
+Word or PDF may be needed for stakeholder delivery, but only when explicitly
+requested. Keep Markdown as the source.
+
+### Example Outline
 
 ```markdown
-
 # Proposal
 
 ## Problem
@@ -230,24 +415,54 @@ Example outline:
 ## Risks
 
 ## Decision Needed
-
 ```
 
 ## Manual / SOP
 
-| Field | Guidance |
-| --- | --- |
-| Trigger keywords | SOP, manual, 操作手册, 指南, runbook, procedure. |
-| Recommended structure | Purpose; scope; prerequisites; roles; steps; checks; rollback; troubleshooting; change log. |
-| Default tone | Procedural, unambiguous, compact. |
-| References to load | 00, 01, 02, language anti-slop, 06, 07, 10, 12. |
-| Do not | Use vague advice, omit prerequisites, or mix rationale with action steps. |
-| Markdown/Word/PDF notes | Lists and tables are appropriate; steps need stable numbering. |
+### Trigger Keywords
 
-Example outline:
+SOP, manual, 操作手册, 指南, runbook, procedure.
+
+### Recommended Structure
+
+- Purpose.
+- Scope.
+- Prerequisites.
+- Roles.
+- Procedure.
+- Verification.
+- Rollback.
+- Troubleshooting.
+- Change log.
+
+### Default Tone
+
+Procedural, unambiguous, compact.
+
+### References To Load
+
+- `references/00-routing-policy.md`
+- `references/01-writing-loop.md`
+- `references/02-human-readable-style.md`
+- Language-specific anti-slop reference.
+- `references/06-document-layout.md`
+- `references/07-markdown-authoring.md`
+- `references/10-quality-gates.md`
+- `references/12-document-type-profiles.md`
+
+### Do Not
+
+- Use vague advice.
+- Omit prerequisites.
+- Mix rationale with action steps.
+
+### Markdown And Export Notes
+
+Lists and tables are appropriate. Steps need stable numbering.
+
+### Example Outline
 
 ```markdown
-
 # SOP Title
 
 ## Purpose
@@ -265,24 +480,51 @@ Example outline:
 ## Troubleshooting
 
 ## Change Log
-
 ```
 
 ## Meeting Notes
 
-| Field | Guidance |
-| --- | --- |
-| Trigger keywords | 会议纪要, meeting notes, minutes, action items, decisions. |
-| Recommended structure | Context; attendees; decisions; discussion summary; risks; action items; open questions. |
-| Default tone | Neutral, concise, accountable. |
-| References to load | 00, 01, 02, language anti-slop, 07, 10, 12. |
-| Do not | Invent decisions, assign owners not present in source, or over-polish disagreements. |
-| Markdown/Word/PDF notes | Tables work well for action items with owner and due date. |
+### Trigger Keywords
 
-Example outline:
+会议纪要, meeting notes, minutes, action items, decisions.
+
+### Recommended Structure
+
+- Context.
+- Attendees.
+- Decisions.
+- Discussion summary.
+- Risks.
+- Action items.
+- Open questions.
+
+### Default Tone
+
+Neutral, concise, accountable.
+
+### References To Load
+
+- `references/00-routing-policy.md`
+- `references/01-writing-loop.md`
+- `references/02-human-readable-style.md`
+- Language-specific anti-slop reference.
+- `references/07-markdown-authoring.md`
+- `references/10-quality-gates.md`
+- `references/12-document-type-profiles.md`
+
+### Do Not
+
+- Invent decisions.
+- Assign owners not present in source.
+- Over-polish disagreements.
+
+### Markdown And Export Notes
+
+Tables work well for action items with owner and due date.
+
+### Example Outline
 
 ```markdown
-
 # Meeting Notes
 
 ## Context
@@ -296,21 +538,48 @@ Example outline:
 ## Action Items
 
 ## Open Questions
-
 ```
 
 ## Email
 
-| Field | Guidance |
-| --- | --- |
-| Trigger keywords | email, 邮件, 通知, follow-up, outreach. |
-| Recommended structure | Subject; opening context; main request or update; details; deadline or action; close. |
-| Default tone | Professional, direct, appropriately polite. |
-| References to load | 00, 01 compressed, 02, language anti-slop, 10, 12. |
-| Do not | Add exaggerated flattery, bury the ask, or invent relationship context. |
-| Markdown/Word/PDF notes | Usually chat output; Markdown only when archived or reused. |
+### Trigger Keywords
 
-Example outline:
+email, 邮件, 通知, follow-up, outreach.
+
+### Recommended Structure
+
+- Subject.
+- Opening context.
+- Main request or update.
+- Details.
+- Deadline or action.
+- Close.
+
+### Default Tone
+
+Professional, direct, appropriately polite.
+
+### References To Load
+
+- `references/00-routing-policy.md`
+- `references/01-writing-loop.md` in compressed form.
+- `references/02-human-readable-style.md`
+- Language-specific anti-slop reference.
+- `references/10-quality-gates.md`
+- `references/12-document-type-profiles.md`
+
+### Do Not
+
+- Add exaggerated flattery.
+- Bury the ask.
+- Invent relationship context.
+
+### Markdown And Export Notes
+
+Usually chat output. Use Markdown only when the email must be archived or
+reused.
+
+### Example Outline
 
 ```markdown
 Subject: Review request for PDF preprocessing design
@@ -326,19 +595,46 @@ Deadline...
 
 ## General Article
 
-| Field | Guidance |
-| --- | --- |
-| Trigger keywords | article, blog, 文章, explanation, guide with no narrower type. |
-| Recommended structure | Reader question; context; main explanation; examples; limitations; conclusion. |
-| Default tone | Clear, explanatory, reader-friendly. |
-| References to load | 00, 01, 02, language anti-slop, 07, 10, 12. |
-| Do not | Use clickbait titles, overgeneralize, or end with generic inspiration. |
-| Markdown/Word/PDF notes | Markdown is default; use Word/PDF only when requested. |
+### Trigger Keywords
 
-Example outline:
+article, blog, 文章, explanation, guide with no narrower type.
+
+### Recommended Structure
+
+- Reader question.
+- Context.
+- Main explanation.
+- Examples.
+- Limitations.
+- Conclusion.
+
+### Default Tone
+
+Clear, explanatory, reader-friendly.
+
+### References To Load
+
+- `references/00-routing-policy.md`
+- `references/01-writing-loop.md`
+- `references/02-human-readable-style.md`
+- Language-specific anti-slop reference.
+- `references/07-markdown-authoring.md`
+- `references/10-quality-gates.md`
+- `references/12-document-type-profiles.md`
+
+### Do Not
+
+- Use clickbait titles.
+- Overgeneralize.
+- End with generic inspiration.
+
+### Markdown And Export Notes
+
+Markdown is default. Use Word or PDF only when requested.
+
+### Example Outline
 
 ```markdown
-
 # Article Title
 
 ## Reader Question
@@ -352,7 +648,6 @@ Example outline:
 ## Limitations
 
 ## Takeaway
-
 ```
 
 ## Boundaries

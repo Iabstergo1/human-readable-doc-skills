@@ -84,6 +84,21 @@ PROFILE_RULES = {
     "general-article": ["文章", "article", "blog", "explanation", "guide"],
 }
 
+EXPLICIT_FORMAT_TERMS = {
+    "Markdown": r"markdown|md|\.md|markdown 源稿",
+    "docx": r"word|docx|\.docx|word 文档",
+    "pdf": r"pdf|\.pdf",
+    "html": r"html|\.html|网页",
+    "slides": r"slides|ppt|pptx|deck|幻灯片|演示文稿",
+}
+
+EXPORT_VERBS = (
+    r"输出|导出|生成|产出|保存为|写成|整理成|"
+    r"转成|转换为|渲染为|output|export|write as|save as|convert to|render to"
+)
+
+FUTURE_EXPORT_MARKERS = r"后续|之后|随后|later|afterward"
+
 
 def read_text(args: argparse.Namespace) -> str:
     if args.file:
@@ -119,18 +134,21 @@ def choose_from_rules(text: str, rules: dict[str, list[str]], default: str) -> t
     return best_name, best_matches
 
 
-def detect_target_format(text: str) -> tuple[str, list[str]]:
-    lowered = text.lower()
-    explicit_patterns = [
-        ("Markdown", r"(输出|导出|生成|产出|保存为|output|export|write as)\s*(为|成|as)?\s*(markdown|md|\.md)"),
-        ("docx", r"(输出|导出|生成|产出|保存为|output|export|write as)\s*(为|成|as)?\s*(word|docx|\.docx)"),
-        ("pdf", r"(输出|导出|生成|产出|保存为|output|export|write as)\s*(为|成|as)?\s*(pdf|\.pdf)"),
-        ("html", r"(输出|导出|生成|产出|保存为|output|export|write as)\s*(为|成|as)?\s*(html|\.html|网页)"),
+def explicit_format_requested(text: str, name: str) -> bool:
+    terms = EXPLICIT_FORMAT_TERMS[name]
+    patterns = [
+        rf"({EXPORT_VERBS})\s*(为|成|as|to)?\s*.{{0,16}}({terms})",
+        rf"({FUTURE_EXPORT_MARKERS}).{{0,30}}({EXPORT_VERBS}).{{0,24}}({terms})",
+        rf"({terms})\s*(文件|文档|版本|artifact|output)",
     ]
-    for name, pattern in explicit_patterns:
-        if re.search(pattern, lowered, flags=re.IGNORECASE):
+    return any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in patterns)
+
+
+def detect_target_format(text: str) -> tuple[str, list[str]]:
+    for name in ["Markdown", "docx", "pdf", "html", "slides"]:
+        if explicit_format_requested(text, name):
             return name, matched_terms(text, FORMAT_RULES[name])
-    return choose_from_rules(text, FORMAT_RULES, "unknown")
+    return "unknown", []
 
 
 def detect_language(text: str) -> str:
@@ -148,11 +166,11 @@ def detect_language(text: str) -> str:
 
 
 def mentions_word(text: str) -> bool:
-    return bool(matched_terms(text, FORMAT_RULES["docx"]))
+    return explicit_format_requested(text, "docx")
 
 
 def mentions_pdf(text: str) -> bool:
-    return bool(matched_terms(text, FORMAT_RULES["pdf"]))
+    return explicit_format_requested(text, "pdf")
 
 
 def recommended_references(
