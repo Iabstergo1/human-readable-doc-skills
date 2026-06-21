@@ -14,6 +14,20 @@ attribution in this file and in the repository README.
 | Missing paths | Mark the exact URL unavailable instead of fabricating alternatives. |
 | Scope | Use only the upstream projects listed below. |
 
+Raw source access checks are recorded in `docs/upstream-source-access.md`.
+
+## Skill-To-Reference Boundary
+
+Upstream `SKILL.md` files are methodology sources here, not active local skill
+entrypoints. The active entrypoint is this repository's local `SKILL.md`; it
+must route tasks to the relevant files in `references/`.
+
+This does not inherently make the workflow weaker. It can make the workflow
+more controllable because one local orchestration layer decides which rewritten
+rules to load. The risk is different: upstream trigger metadata, tool guidance,
+or entrypoint behavior has no effect unless it is intentionally rewritten into
+local `SKILL.md`, `references/`, or `scripts/`.
+
 ## Upstream Map
 
 ### Writer's Loop
@@ -38,7 +52,7 @@ attribution in this file and in the repository README.
 - Repo: https://github.com/MohamedAbdallah-14/unslop
 - Main skill: https://github.com/MohamedAbdallah-14/unslop/tree/main/skills/unslop
 - Review skill: https://github.com/MohamedAbdallah-14/unslop/tree/main/skills/unslop-review
-- Unavailable path: `skills/humanize`.
+- Unavailable path: `skills/humanize` returned 404 on 2026-06-22.
 - Borrowed method: conservative anti-template editing.
 - Local impact: Chinese and English anti-slop references, `lint_ai_style.py`.
 - License note: GitHub metadata previously observed as MIT.

@@ -185,6 +185,7 @@ python .\.agents\skills\human-readable-document-workflow\scripts\validate_markdo
 
 This repository uses the following upstream projects as methodology references
 only. Rules and scripts in this repository are rewritten locally.
+Raw source access checks are recorded in `docs/upstream-source-access.md`.
 
 | Project | URL | License note |
 | --- | --- | --- |
