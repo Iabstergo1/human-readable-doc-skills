@@ -11,20 +11,24 @@ description: >-
 
 # Human Readable Document Workflow
 
-Use this skill as the orchestration layer for long-form document work. Keep the
-main file short: route the task, load only relevant references, use scripts for
-deterministic checks, and deliver a readable source document before any rendered
-artifact.
+Use this skill as the orchestration layer for long-form document source work.
+Keep the main file short: route the task, load only relevant references, use
+scripts for deterministic checks, and deliver a clean Markdown source draft.
 
 ## Trigger Boundary
 
 Use this skill when the user asks to create, draft, rewrite, polish, structure,
-typeset, export, or validate a reusable document. Typical deliverables include
-Markdown, Word, PDF, technical design docs, academic writing, reports,
+typeset, export, or validate a reusable document. Typical requests include
+Markdown, Word, PDF, slides, technical design docs, academic writing, reports,
 proposals, README files, SOPs, meeting notes, and email drafts.
 
 Do not use this skill for short casual answers, code-only implementation tasks,
 or one-line rewrites unless the user explicitly wants a reusable document.
+
+This skill does not generate, render, or edit binary artifacts. If the user
+asks for Word, PDF, slides, or another concrete file artifact, use this skill
+to prepare the clean Markdown source first, then hand off to the appropriate
+official document-generation skill or tool.
 
 ## Routing
 
@@ -52,12 +56,9 @@ Read only the references needed for the current task:
 - Academic writing: `references/05-academic-writing.md`
 - Layout rules: `references/06-document-layout.md`
 - Markdown source rules: `references/07-markdown-authoring.md`
-- Word export: `references/08-word-export.md` only when explicitly requested.
-- PDF export: `references/09-pdf-export.md` only when explicitly requested.
 - Final checks: `references/10-quality-gates.md`
 - Upstream attribution: `references/11-upstream-attribution.md`
 - Document type profiles: `references/12-document-type-profiles.md`
-- Workflow examples: `references/13-workflow-examples.md`
 
 ## Four-Layer Framework
 
@@ -80,20 +81,18 @@ do not skip fact-boundary checks.
    literature reviews, thesis sections, model descriptions, citation work, or
    any text that uses scholarly claims, variables, symbols, or references.
 
-4. **Rendering and layout layer**
-   Load `references/06-document-layout.md`,
-   `references/07-markdown-authoring.md`, and only the export references
-   explicitly requested for the artifacts:
-   `references/08-word-export.md` for Word,
-   `references/09-pdf-export.md` for PDF.
+4. **Markdown source and handoff layer**
+   Load `references/06-document-layout.md` and
+   `references/07-markdown-authoring.md`. Produce a clean Markdown source draft
+   for substantial documents. If the requested final artifact is Word, PDF, or
+   slides, hand off the clean source to the appropriate official
+   document-generation skill or tool. Do not fake binary artifacts.
 
 ## Markdown Source Rule
 
-Markdown is the canonical source for substantial documents. Word and PDF are
-optional export adapters, not the core capability. If the user explicitly asks
-for Word or PDF, first produce or update a clean Markdown source draft, then
-render or provide the render command. Do not treat `.docx` or `.pdf` as formats
-the model should fake directly.
+Markdown is the canonical handoff format for substantial documents. This skill
+produces clean, structured Markdown source. File rendering, binary artifact
+creation, and rich document editing are outside this skill's responsibility.
 
 ## Script Use
 
@@ -106,10 +105,9 @@ Use scripts when deterministic checks are useful:
   quotes, and citations.
 - `scripts/normalize_markdown.py`: check or fix Markdown spacing, frontmatter,
   headings, code fences, table spacing, long lines, and list density.
-- `scripts/render_with_pandoc.py`: render Markdown to Word or PDF when Pandoc is
-  available.
-- `scripts/validate_outputs.py`: validate generated Markdown, docx, pdf, and
-  obvious placeholders.
+- `scripts/validate_markdown_source.py`: validate Markdown source before
+  handoff, including frontmatter, heading levels, code fences, placeholders,
+  citation placeholders, and long lines.
 - `scripts/validate_skill.py`: validate this skill package after edits.
 
 ## Quality Gates
@@ -122,8 +120,9 @@ Before final delivery, load `references/10-quality-gates.md` and verify:
 - The prose is readable without forced casualness or obvious AI patterns.
 - Markdown is renderable, with stable headings, tables, code blocks, captions,
   formulas, and links.
-- Explicit Word/PDF export requests have a Markdown source and either a rendered
-  artifact or a clear local render command.
+- If the user requested a rendered artifact, the Markdown source is ready for
+  handoff to an official document-generation skill or tool.
 
-In the final answer, provide the artifact path, rendered output, or concise
-summary the user needs. Do not expose the internal critique trace unless asked.
+In the final answer, provide the Markdown source path, a concise summary, and
+any handoff note the user needs. Do not expose the internal critique trace
+unless asked.

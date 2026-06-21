@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Validate generated document artifacts."""
+"""Validate clean Markdown source documents for handoff."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import re
-import zipfile
 from pathlib import Path
 
 
@@ -21,34 +20,13 @@ def is_table_line(line: str) -> bool:
     return stripped.startswith("|") and stripped.endswith("|") and stripped.count("|") >= 2
 
 
-def inspect_file(path: Path) -> dict[str, object]:
-    exists = path.exists()
-    size = path.stat().st_size if exists else 0
-    issues: list[str] = []
-    if not exists:
-        issues.append("file-not-found")
-    elif size == 0:
-        issues.append("file-empty")
-    elif path.suffix.lower() == ".docx":
-        if not zipfile.is_zipfile(path):
-            issues.append("docx-not-zip")
-        else:
-            with zipfile.ZipFile(path) as archive:
-                names = set(archive.namelist())
-            if "word/document.xml" not in names:
-                issues.append("docx-missing-word-document")
-    elif path.suffix.lower() == ".pdf":
-        with path.open("rb") as handle:
-            header = handle.read(4)
-        if header != b"%PDF":
-            issues.append("pdf-header-invalid")
-    return {
-        "path": str(path),
-        "exists": exists,
-        "size": size,
-        "issues": issues,
-        "ok": not issues,
-    }
+def frontmatter_bounds(lines: list[str]) -> tuple[int | None, int | None]:
+    if not lines or lines[0].strip() != "---":
+        return None, None
+    for index, line in enumerate(lines[1:], start=2):
+        if line.strip() == "---":
+            return 1, index
+    return 1, None
 
 
 def inspect_markdown(path: Path, max_line_length: int = 180) -> list[dict[str, object]]:
@@ -57,9 +35,17 @@ def inspect_markdown(path: Path, max_line_length: int = 180) -> list[dict[str, o
 
     issues: list[dict[str, object]] = []
     lines = path.read_text(encoding="utf-8").splitlines()
+    if not lines:
+        return [{"path": str(path), "line": None, "issue": "markdown-empty"}]
+
+    frontmatter_start, frontmatter_end = frontmatter_bounds(lines)
+    if frontmatter_start is not None and frontmatter_end is None:
+        issues.append({"path": str(path), "line": 1, "issue": "frontmatter-unclosed"})
+
     heading_seen = False
     in_code = False
     fence_start: int | None = None
+    previous_heading_level = 0
 
     for line_no, line in enumerate(lines, start=1):
         stripped = line.strip()
@@ -74,6 +60,18 @@ def inspect_markdown(path: Path, max_line_length: int = 180) -> list[dict[str, o
             )
         if re.match(r"^#\s+\S", line):
             heading_seen = True
+        heading = re.match(r"^(#{1,6})\s+\S", line)
+        if heading:
+            level = len(heading.group(1))
+            if previous_heading_level and level > previous_heading_level + 1:
+                issues.append(
+                    {
+                        "path": str(path),
+                        "line": line_no,
+                        "issue": "skipped-heading-level",
+                    }
+                )
+            previous_heading_level = level
         if stripped.startswith("```") or stripped.startswith("~~~"):
             if not in_code:
                 in_code = True
@@ -124,22 +122,19 @@ def inspect_markdown(path: Path, max_line_length: int = 180) -> list[dict[str, o
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate generated files and Markdown placeholders.")
-    parser.add_argument("paths", nargs="*", type=Path, help="Files that should exist and be non-empty.")
-    parser.add_argument("--markdown", action="append", type=Path, default=[], help="Markdown file to scan.")
+    parser = argparse.ArgumentParser(description="Validate Markdown source before document handoff.")
+    parser.add_argument("paths", nargs="+", type=Path, help="Markdown source files to scan.")
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
     parser.add_argument("--max-line-length", type=int, default=180, help="Maximum non-URL Markdown line length.")
     args = parser.parse_args()
 
-    files = [inspect_file(path) for path in args.paths]
     markdown_issues: list[dict[str, object]] = []
-    for path in args.markdown:
+    for path in args.paths:
         markdown_issues.extend(inspect_markdown(path, max_line_length=args.max_line_length))
 
-    ok = all(item["ok"] for item in files) and not markdown_issues
+    ok = not markdown_issues
     result = {
         "ok": ok,
-        "files": files,
         "markdown_issues": markdown_issues,
         "markdown_issue_count": len(markdown_issues),
     }

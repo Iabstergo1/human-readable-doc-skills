@@ -196,10 +196,6 @@ def recommended_references(
                 "references/07-markdown-authoring.md",
             ]
         )
-    if target_format == "docx" or mentions_word(text):
-        refs.append("references/08-word-export.md")
-    if target_format == "pdf" or mentions_pdf(text):
-        refs.append("references/09-pdf-export.md")
     refs.extend(
         [
             "references/10-quality-gates.md",
@@ -213,12 +209,10 @@ def recommended_scripts(text: str, target_format: str) -> list[str]:
     scripts = ["scripts/detect_doc_intent.py"]
     if any(term in text.lower() for term in ["润色", "改写", "polish", "revise", "ai 味"]):
         scripts.append("scripts/lint_ai_style.py")
-    if target_format in {"Markdown", "docx", "pdf"} or mentions_word(text) or mentions_pdf(text):
+    if target_format in {"Markdown", "docx", "pdf", "slides"} or mentions_word(text) or mentions_pdf(text):
         scripts.append("scripts/normalize_markdown.py")
-    if target_format in {"docx", "pdf"} or mentions_word(text) or mentions_pdf(text):
-        scripts.append("scripts/render_with_pandoc.py")
     if target_format != "chat answer":
-        scripts.append("scripts/validate_outputs.py")
+        scripts.append("scripts/validate_markdown_source.py")
     return list(dict.fromkeys(scripts))
 
 

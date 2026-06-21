@@ -1,7 +1,7 @@
 # Document Type Profiles
 
 Use profiles to avoid applying one generic anti-AI rule set to every document.
-Each profile defines structure, tone, references, export notes, and boundaries.
+Each profile defines structure, tone, references, source notes, and boundaries.
 
 ## Profile Index
 
@@ -49,8 +49,6 @@ Direct, concrete, implementation-oriented.
 - Language-specific anti-slop reference.
 - `references/06-document-layout.md`
 - `references/07-markdown-authoring.md`
-- `references/08-word-export.md` only when Word export is explicitly requested.
-- `references/09-pdf-export.md` only when PDF export is explicitly requested.
 - `references/10-quality-gates.md`
 - `references/12-document-type-profiles.md`
 
@@ -61,10 +59,11 @@ Direct, concrete, implementation-oriented.
 - Hide assumptions.
 - Use diagrams without explanation.
 
-### Markdown And Export Notes
+### Markdown Source Notes
 
 Prefer Markdown source with tables for I/O and risks. Code blocks need language
-labels. Word and PDF should render from the same source only when requested.
+labels. If a file artifact is requested, the source should be ready for
+handoff.
 
 ### Example Outline
 
@@ -141,7 +140,7 @@ Practical, concise, project-facing.
 - Omit setup commands.
 - Bury limitations.
 
-### Markdown And Export Notes
+### Markdown Source Notes
 
 Markdown is usually the final format. Tables must render cleanly on GitHub.
 
@@ -205,7 +204,7 @@ Formal, precise, source-bounded.
 - Flatten model logic into generic prose.
 - Remove necessary formal terms only to sound casual.
 
-### Markdown And Export Notes
+### Markdown Source Notes
 
 Use YAML frontmatter when useful. Formulas need explanation. Citations must come
 from supplied sources or remain as `[citation needed]`.
@@ -266,7 +265,7 @@ Synthetic, careful, non-inventive.
 - Fabricate citation clusters.
 - Treat a list of paper summaries as synthesis.
 
-### Markdown And Export Notes
+### Markdown Source Notes
 
 Use tables only for real comparisons. Keep placeholders visible when sources are
 missing.
@@ -327,7 +326,7 @@ Clear, decision-oriented, factual.
 - Use generic growth language.
 - Hide the decision the reader needs to make.
 
-### Markdown And Export Notes
+### Markdown Source Notes
 
 Tables are useful for options, costs, risks, and owners.
 
@@ -390,10 +389,10 @@ Persuasive but concrete.
 - Hide cost.
 - Use vague benefit language.
 
-### Markdown And Export Notes
+### Markdown Source Notes
 
-Word or PDF may be needed for stakeholder delivery, but only when explicitly
-requested. Keep Markdown as the source.
+A file artifact may be needed for stakeholder delivery, but this profile only
+prepares Markdown source for handoff.
 
 ### Example Outline
 
@@ -456,7 +455,7 @@ Procedural, unambiguous, compact.
 - Omit prerequisites.
 - Mix rationale with action steps.
 
-### Markdown And Export Notes
+### Markdown Source Notes
 
 Lists and tables are appropriate. Steps need stable numbering.
 
@@ -518,7 +517,7 @@ Neutral, concise, accountable.
 - Assign owners not present in source.
 - Over-polish disagreements.
 
-### Markdown And Export Notes
+### Markdown Source Notes
 
 Tables work well for action items with owner and due date.
 
@@ -574,7 +573,7 @@ Professional, direct, appropriately polite.
 - Bury the ask.
 - Invent relationship context.
 
-### Markdown And Export Notes
+### Markdown Source Notes
 
 Usually chat output. Use Markdown only when the email must be archived or
 reused.
@@ -628,9 +627,9 @@ Clear, explanatory, reader-friendly.
 - Overgeneralize.
 - End with generic inspiration.
 
-### Markdown And Export Notes
+### Markdown Source Notes
 
-Markdown is default. Use Word or PDF only when requested.
+Markdown is default. Use handoff when the user requests a rendered artifact.
 
 ### Example Outline
 

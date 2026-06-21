@@ -3,7 +3,12 @@
 These replay tests use realistic document requests instead of short fixtures.
 They record the input, routed references, draft output path, lint result, and
 manual critique. The goal is to check whether the skill improves real document
-work, not only whether keyword fixtures pass.
+source work, not only whether keyword fixtures pass.
+
+The replay scope is Markdown source quality. These tests do not render Word,
+PDF, slides, or other binary artifacts. If an input mentions Word or PDF, the
+replay checks whether the Markdown source is clean enough for handoff to an
+official document-generation skill or tool.
 
 ## Replay Index
 
@@ -68,6 +73,8 @@ preprocessing layer's responsibility.
 - The output should describe PDF as the problem domain, not as an export target.
 - The draft should name inputs, outputs, failure states, and validation data.
 - It should avoid marketing words such as `赋能` and unsupported success claims.
+- If the user later asks for Word or PDF, this Markdown source should be handed
+  off rather than rendered by this skill.
 
 ## Replay 2: Academic Chapter Model
 

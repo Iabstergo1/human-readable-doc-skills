@@ -100,6 +100,6 @@ The bad version skips heading levels and gives no body content.
 
 ## Boundaries
 
-Markdown is not a full layout language. Put page size, margins, fonts, and
-headers in Word reference documents, Quarto config, Typst templates, or Pandoc
-options.
+Markdown is not a full layout language. Keep page size, margins, fonts, and
+headers for the official document-generation tool that receives the clean
+source during handoff.

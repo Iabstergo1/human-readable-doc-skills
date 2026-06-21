@@ -52,9 +52,9 @@ python .\.agents\skills\human-readable-document-workflow\scripts\normalize_markd
   .\tests\fixtures\bad-markdown.md --check --report .\tmp\markdown-report.json
 ```
 
-## Output Validation
+## Markdown Source Validation
 
 ```powershell
-python .\.agents\skills\human-readable-document-workflow\scripts\validate_outputs.py `
-  .\tests\fixtures\good-markdown.md --markdown .\tests\fixtures\good-markdown.md --pretty
+python .\.agents\skills\human-readable-document-workflow\scripts\validate_markdown_source.py `
+  .\tests\fixtures\good-markdown.md --pretty
 ```

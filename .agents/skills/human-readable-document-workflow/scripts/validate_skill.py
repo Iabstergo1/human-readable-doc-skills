@@ -22,21 +22,31 @@ REQUIRED_REFERENCES = [
     "references/05-academic-writing.md",
     "references/06-document-layout.md",
     "references/07-markdown-authoring.md",
-    "references/08-word-export.md",
-    "references/09-pdf-export.md",
     "references/10-quality-gates.md",
     "references/11-upstream-attribution.md",
     "references/12-document-type-profiles.md",
-    "references/13-workflow-examples.md",
 ]
 
 REQUIRED_SCRIPTS = [
     "scripts/detect_doc_intent.py",
     "scripts/lint_ai_style.py",
     "scripts/normalize_markdown.py",
-    "scripts/render_with_pandoc.py",
-    "scripts/validate_outputs.py",
+    "scripts/validate_markdown_source.py",
     "scripts/validate_skill.py",
+]
+
+REQUIRED_README_SECTIONS = [
+    "## Core capability",
+    "## Out of scope",
+    "## Handoff policy",
+]
+
+SKILL_FORBIDDEN_TERMS = [
+    "render_with_pandoc.py",
+    "Pandoc",
+    "Quarto",
+    "Typst",
+    "reference.docx",
 ]
 
 REQUIRED_DESCRIPTION = (
@@ -271,6 +281,24 @@ def readme_attribution(readme_path: Path) -> dict[str, object]:
     return {"ok": not missing, "missing_urls": missing}
 
 
+def readme_scope(readme_path: Path) -> dict[str, object]:
+    text = readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
+    missing = [section for section in REQUIRED_README_SECTIONS if section not in text]
+    return {"ok": not missing, "missing_sections": missing}
+
+
+def skill_scope(skill_path: Path) -> dict[str, object]:
+    text = skill_path.read_text(encoding="utf-8") if skill_path.exists() else ""
+    forbidden = [term for term in SKILL_FORBIDDEN_TERMS if term in text]
+    lowered = text.lower()
+    has_handoff = "handoff" in lowered or "official document-generation skill" in lowered
+    return {
+        "ok": not forbidden and has_handoff,
+        "forbidden_terms": forbidden,
+        "has_handoff_boundary": has_handoff,
+    }
+
+
 def validate(repo_root: Path, max_line_length: int) -> dict[str, object]:
     skill_dir = repo_root / ".agents" / "skills" / "human-readable-document-workflow"
     skill_path = skill_dir / "SKILL.md"
@@ -281,13 +309,15 @@ def validate(repo_root: Path, max_line_length: int) -> dict[str, object]:
     script_paths = [skill_dir / script for script in REQUIRED_SCRIPTS if (skill_dir / script).exists()]
     script_help = [check_script_help(script) for script in script_paths]
     script_compile = [py_compile_script(script) for script in script_paths]
-    assets_readme = skill_dir / "assets" / "README.md"
     md_issues = markdown_issues(repo_root, max_line_length)
     py_line_issues = python_line_issues(skill_dir)
-    attribution = readme_attribution(repo_root / "README.md")
+    readme_path = repo_root / "README.md"
+    attribution = readme_attribution(readme_path)
+    readme_scope_check = readme_scope(readme_path)
 
     checks = {
         "frontmatter": parse_frontmatter(skill_path),
+        "skill_scope": skill_scope(skill_path),
         "required_references": {
             "ok": not missing_required_refs,
             "missing": missing_required_refs,
@@ -314,10 +344,7 @@ def validate(repo_root: Path, max_line_length: int) -> dict[str, object]:
             "ok": not md_issues,
             "issues": md_issues,
         },
-        "assets_readme": {
-            "ok": assets_readme.exists(),
-            "path": rel(assets_readme, repo_root),
-        },
+        "readme_scope": readme_scope_check,
         "readme_upstream_attribution": attribution,
     }
     ok = all(check["ok"] for check in checks.values())  # type: ignore[index]

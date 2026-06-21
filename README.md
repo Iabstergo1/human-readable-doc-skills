@@ -1,53 +1,51 @@
 # Human Readable Doc Skills
 
-This repository provides a Codex skill for document generation and revision. It
-turns broad requests such as "write a technical design", "polish this report",
-or "make this README clearer" into a controlled workflow: route the document
-type, load focused references, produce Markdown as the source of truth, and
-verify the result before delivery.
+v1.0.0 provides a Codex skill for human-readable document source workflows. It
+routes document requests, applies a writing loop, improves prose, organizes
+structure, and produces clean Markdown source that can be reviewed or handed
+off to official document-generation tooling.
 
-## Core Capability
+This project does not render Word, PDF, slides, or other binary artifacts. File
+rendering is delegated to external official document tooling.
 
-- Keeps `SKILL.md` small while giving Codex deeper rules through references.
-- Separates writing workflow, human-readable style, document structure, and
-  Markdown layout rules.
-- Provides standard-library scripts for deterministic checks.
-- Treats Markdown as the canonical source for substantial document work.
-- Preserves attribution for methodology references without vendoring upstream
-  projects.
+## Core capability
 
-The core skill is a human-readable document workflow. It improves planning,
-drafting, revision, structure, Markdown authoring, style review, and final
-quality checks. It is not a full Word or PDF rendering system.
+- Document intent routing.
+- Writing loop: intake, frame, plan, draft, critique, revise, finalize.
+- Human-readable style rules.
+- Simplified Chinese anti-AI-style cleanup.
+- English anti-AI-style cleanup.
+- Academic writing safeguards.
+- Document type profiles.
+- Markdown source authoring.
+- Quality gates.
 
-## Optional Export Adapter
+## Out of scope
 
-Word and PDF support are optional adapters used only when the user explicitly
-requests those artifacts. The skill first creates or updates Markdown, then
-renders through local tools when available or provides a reproducible command
-when they are not.
+- Direct Word/PDF binary generation.
+- Pandoc / Quarto / Typst template system.
+- Word tracked changes editing.
+- PDF repair or layout editing.
+- Fabricated citations.
+- Claiming a rendered artifact exists when this skill only produced source
+  text.
 
-- Word output uses `references/08-word-export.md`,
-  `assets/reference.docx`, and `render_with_pandoc.py`.
-- PDF output uses `references/09-pdf-export.md` and local routes such as
-  Pandoc, Quarto, or Typst.
-- Markdown-only tasks should not load Word or PDF export rules.
-- Do not claim a `.docx` or `.pdf` exists unless a command created it.
+## Handoff policy
 
-## What This Does Not Solve
+If the user requests Word, PDF, slides, or another concrete file artifact:
 
-- It does not replace domain verification for legal, medical, financial, or
-  academic claims.
-- It does not fabricate citations, benchmark data, authors, DOIs, or sources.
-- It does not directly edit Word tracked changes or repair binary PDFs.
-- It does not copy upstream skill text, prompts, templates, or repositories.
-- It does not introduce heavy dependencies; scripts use Python standard library.
+1. Use this skill to plan and produce the clean Markdown source.
+2. Then hand off to Codex official docs/document skill or the appropriate
+   file-generation tool.
+3. Do not perform local rendering inside this skill.
 
 ## Architecture
 
 ```text
 human-readable-doc-skills/
 ├── AGENTS.md
+├── docs/
+│   └── workflow-examples.md
 ├── README.md
 ├── tests/
 │   ├── README.md
@@ -78,13 +76,11 @@ human-readable-doc-skills/
    Main files: `references/05-academic-writing.md`,
    `references/12-document-type-profiles.md`.
 
-4. Rendering and layout:
-   keep Markdown source readable and renderable; load Word/PDF export guidance
-   only when those artifacts are explicitly requested.
+4. Markdown source and handoff:
+   keep Markdown source readable, source-bounded, and ready for external
+   official document-generation tooling when a file artifact is requested.
    Main files: `references/06-document-layout.md`,
-   `references/07-markdown-authoring.md`,
-   `references/08-word-export.md`,
-   `references/09-pdf-export.md`.
+   `references/07-markdown-authoring.md`.
 
 ## Install To Repo Scope
 
@@ -149,39 +145,6 @@ Rules:
 - Protect Markdown frontmatter, code fences, tables, URLs, quotes, citations,
   and bibliography entries during style cleanup.
 
-## Replace The Word Template
-
-This section applies only to explicit Word export requests.
-`assets/reference.docx` is the Word reference document path used by the Pandoc
-wrapper. Replace it with your own template when production styling matters.
-
-```powershell
-Copy-Item -Force C:\path\to\your-template.docx `
-  .\.agents\skills\human-readable-document-workflow\assets\reference.docx
-```
-
-Render Word:
-
-```powershell
-python .\.agents\skills\human-readable-document-workflow\scripts\render_with_pandoc.py `
-  .\draft.md --to docx --output .\draft.docx `
-  --reference-doc .\.agents\skills\human-readable-document-workflow\assets\reference.docx
-```
-
-## Configure PDF Routes
-
-This section applies only to explicit PDF export requests. The PDF layer
-supports three routes:
-
-| Route | Command family | Use when |
-| --- | --- | --- |
-| Pandoc | `render_with_pandoc.py --to pdf` | General Markdown to PDF. |
-| Quarto | `quarto render` | Computational reports or Quarto projects. |
-| Typst | `typst compile` | Typst-native layouts. |
-
-If the renderer is unavailable, deliver clean Markdown and the command needed to
-render locally. Do not claim a PDF exists unless a command created it.
-
 ## Validation
 
 Run the skill package validator:
@@ -209,6 +172,13 @@ Run Markdown checks:
 ```powershell
 python .\.agents\skills\human-readable-document-workflow\scripts\normalize_markdown.py `
   .\tests\fixtures\bad-markdown.md --check --report .\tmp\markdown-report.json
+```
+
+Run Markdown source validation:
+
+```powershell
+python .\.agents\skills\human-readable-document-workflow\scripts\validate_markdown_source.py `
+  .\tests\fixtures\good-markdown.md --pretty
 ```
 
 ## Upstream Projects

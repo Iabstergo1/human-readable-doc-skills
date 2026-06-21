@@ -1,7 +1,9 @@
 # Workflow Examples
 
-These examples show how the skill routes common requests and chooses references.
-They are routing examples, not templates to copy verbatim into user output.
+These examples are development and calibration material. They show how the
+skill routes common requests, chooses references, checks Markdown source
+quality, and prepares handoff notes. They are not runtime references and should
+not be loaded by default.
 
 ## Example 1: PDF Preprocessing Technical Design
 
@@ -17,7 +19,7 @@ They are routing examples, not templates to copy verbatim into user output.
 | --- | --- |
 | detected intent | Create a reusable technical design document. |
 | document type | `technical-design` |
-| target format | `Markdown`; later Word and PDF. |
+| target format | `Markdown`; later handoff for Word and PDF. |
 | language | `zh-CN` |
 | needs Markdown source | `true` |
 
@@ -29,8 +31,6 @@ They are routing examples, not templates to copy verbatim into user output.
 - `references/03-anti-ai-slop-zh.md`
 - `references/06-document-layout.md`
 - `references/07-markdown-authoring.md`
-- `references/08-word-export.md`
-- `references/09-pdf-export.md`
 - `references/10-quality-gates.md`
 - `references/12-document-type-profiles.md`
 
@@ -38,7 +38,7 @@ They are routing examples, not templates to copy verbatim into user output.
 
 - `detect_doc_intent.py --pretty`
 - `normalize_markdown.py --check --report`
-- `validate_outputs.py --markdown`
+- `validate_markdown_source.py`
 
 ### Expected Output Shape
 
@@ -133,7 +133,7 @@ They are routing examples, not templates to copy verbatim into user output.
 ### Scripts To Run If File-Based
 
 - `normalize_markdown.py --check --report`
-- `validate_outputs.py --markdown`
+- `validate_markdown_source.py`
 
 ### Expected Output Shape
 
@@ -241,7 +241,7 @@ They are routing examples, not templates to copy verbatim into user output.
 ### Scripts To Run If File-Based
 
 - `normalize_markdown.py --check --report`
-- `validate_outputs.py --markdown`
+- `validate_markdown_source.py`
 
 ### Expected Output Shape
 

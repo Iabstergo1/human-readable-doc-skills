@@ -2,7 +2,7 @@
 
 Use these gates before final delivery. They are not a replacement for domain
 verification; they ensure the document is coherent, readable, source-bounded,
-and renderable.
+and ready for Markdown-source handoff.
 
 ## Gate Summary
 
@@ -12,8 +12,8 @@ and renderable.
 | Source boundary | Facts, citations, and claims stay inside provided evidence. | Manual check. |
 | Structure | Headings, sections, and order match the document type. | `normalize_markdown.py`. |
 | Style | Obvious AI phrasing is removed without casualizing precise text. | `lint_ai_style.py`. |
-| Markdown | Source is raw-readable and renderable. | `normalize_markdown.py`. |
-| Output artifacts | Explicitly requested files exist and have plausible file structure. | `validate_outputs.py`. |
+| Markdown | Source is raw-readable and handoff-ready. | `normalize_markdown.py`. |
+| Source validation | Placeholders, heading issues, and code-fence issues are visible. | `validate_markdown_source.py`. |
 
 ## Goal And Reader
 
@@ -54,18 +54,17 @@ Non-goal: not a user-facing product overview.
 - Code blocks have language labels.
 - Figures, tables, and formulas have captions or explanations.
 
-## Output Path
+## Handoff Path
 
-Apply Word and PDF checks only when the user explicitly asks for those exported
-artifacts. A task about PDF content, PDF preprocessing, or Word-related prose is
-not automatically a PDF or Word export request.
+Apply file-artifact checks outside this skill. A task about PDF content, PDF
+preprocessing, or Word-related prose is not automatically a rendered file
+request.
 
 | Requested output | Required evidence |
 | --- | --- |
 | Markdown | Source file or Markdown text passes readability checks. |
-| Word, explicitly requested | Markdown source exists and `.docx` is rendered or command is provided. |
-| PDF, explicitly requested | Markdown source exists and `.pdf` is rendered or command is provided. |
-| Word plus PDF | One canonical Markdown source drives both artifacts. |
+| Word, PDF, or slides | Markdown source is clean and ready for handoff. |
+| Chat answer | Response stays source-bounded and does not claim file creation. |
 
 ## Suggested Commands
 
@@ -76,8 +75,8 @@ python .\.agents\skills\human-readable-document-workflow\scripts\normalize_markd
 python .\.agents\skills\human-readable-document-workflow\scripts\lint_ai_style.py `
   .\draft.md --format json --pretty
 
-python .\.agents\skills\human-readable-document-workflow\scripts\validate_outputs.py `
-  .\draft.md --markdown .\draft.md --pretty
+python .\.agents\skills\human-readable-document-workflow\scripts\validate_markdown_source.py `
+  .\draft.md --pretty
 ```
 
 ## Boundaries

@@ -21,5 +21,5 @@ downstream indexing.
 ## Validation Command
 
 ```powershell
-python .\scripts\validate_outputs.py .\draft.md --markdown .\draft.md
+python .\scripts\validate_markdown_source.py .\draft.md
 ```
