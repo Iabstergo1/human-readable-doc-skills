@@ -44,7 +44,10 @@ local `SKILL.md`, `references/`, or `scripts/`.
 - Out-of-scope parts: durable preference journal and local style pack storage
   unless the user explicitly asks for storage.
 - Source access status: raw `SKILL.md` was accessible on 2026-06-22; source
-  text is summarized and rewritten locally.
+  reference files for checkpoints, critique rubrics, preference signals, style
+  distillation, technical writing, business writing, translation, and
+  validation scenarios were also accessible. Source text is summarized and
+  rewritten locally.
 - License note: GitHub metadata previously observed as MIT.
 
 ### codex-be-serious
@@ -68,7 +71,6 @@ local `SKILL.md`, `references/`, or `scripts/`.
 - Repo: https://github.com/MohamedAbdallah-14/unslop
 - Main skill: https://github.com/MohamedAbdallah-14/unslop/tree/main/skills/unslop
 - Review skill: https://github.com/MohamedAbdallah-14/unslop/tree/main/skills/unslop-review
-- Unavailable path: `skills/humanize` returned 404 on 2026-06-22.
 - Borrowed capability: conservative anti-template cleanup, voice preservation,
   stock vocabulary cleanup, hedging cleanup, tricolon cleanup, and technical
   preservation.
@@ -80,7 +82,7 @@ local `SKILL.md`, `references/`, or `scripts/`.
 - Out-of-scope parts: slash modes, anti-detector mode, hooks, statusline,
   session-wide persistence, and PR comment workflows.
 - Source access status: raw main and review skills were accessible on
-  2026-06-22; `skills/humanize` is unavailable.
+  2026-06-22. No separate humanize skill path is required for this project.
 - License note: GitHub metadata previously observed as MIT.
 
 ### anti-slop-writing
@@ -96,8 +98,9 @@ local `SKILL.md`, `references/`, or `scripts/`.
   cleanup from creative/blog cleanup.
 - Out-of-scope parts: hard detector-first rewriting, absolute vocabulary bans,
   forced imperfection, and absolute em-dash bans.
-- Source access status: raw English `SKILL.md` was accessible on 2026-06-22;
-  source text is summarized and rewritten locally.
+- Source access status: raw English `SKILL.md`, vocabulary banlist, and
+  structural patterns were accessible on 2026-06-22; source text is summarized
+  and rewritten locally.
 - License note: GitHub metadata previously observed as MIT.
 
 ### qu-ai-wei
@@ -114,8 +117,9 @@ local `SKILL.md`, `references/`, or `scripts/`.
   taxonomy and reference files need source text for fuller migration.
 - Out-of-scope parts: generic brand voice, platform-specific playbooks, and
   reusable whitelists unless the user supplies a target brand or platform.
-- Source access status: raw main `SKILL.md` was accessible on 2026-06-22, but
-  long reference files were not fully migrated.
+- Source access status: raw main `SKILL.md` and listed references were
+  accessible on 2026-06-22. Long reference taxonomies are summarized but not
+  vendored.
 - License note: GitHub metadata previously observed as MIT.
 
 ### Humanizer-zh

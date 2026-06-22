@@ -212,9 +212,6 @@ Capability parity is recorded in `docs/upstream-parity-matrix.md`.
 | prompts.chat | https://github.com/f/prompts.chat | GitHub metadata previously observed as Other / NOASSERTION. |
 | ChatGPT Prompts for Academic Writing | https://github.com/ahmetbersoz/chatgpt-prompts-for-academic-writing | License metadata previously observed as unknown. |
 
-Do not invent unavailable paths. The requested `unslop` path
-`skills/humanize` is treated as unavailable unless verified later.
-
 ## License Notes
 
 This repository does not vendor upstream repositories. If future work copies

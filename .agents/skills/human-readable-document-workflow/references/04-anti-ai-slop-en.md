@@ -15,12 +15,16 @@ SOPs, proposals, formal email, and policy-like documents.
 Rules:
 
 - Do not optimize for AI detectors.
+- Subtract before adding: remove filler, but do not add claims, anecdotes,
+  metrics, or certainty.
 - Do not force sentence fragments, first person, confessional tone, or
   emotional texture into formal prose.
 - Do not absolutely ban em dashes; limit overuse and repeated rhythm.
 - Do not replace formal terminology with casual wording.
 - Protect facts, structure, technical terms, citations, code, URLs, tables, and
   Markdown.
+- Preserve real uncertainty. Do not turn "may", "assumes", "unknown", or
+  "requires validation" into fake confidence.
 - Prefer concrete mechanisms, constraints, evidence, and next actions over
   stock enthusiasm.
 
@@ -39,6 +43,8 @@ Rules:
 - Add viewpoints or concrete scenes only when the user supplied the underlying
   facts.
 - Do not invent facts, anecdotes, metrics, quotes, or experience.
+- Keep style separate from stance: matching a voice does not mean copying the
+  sample's opinions, facts, or confidence level.
 
 ## Pattern Catalog
 
@@ -108,6 +114,29 @@ Rules:
 - Keep when: academic conventions require a conclusion section.
 - Rewrite: summarize actual findings and open questions.
 
+### Negative Parallelisms
+
+- Risk: creates a polished contrast without a real distinction.
+- Common phrases: `not just X but Y`, `not merely X but Y`.
+- Keep when: the contrast defines a boundary, tradeoff, or mechanism.
+- Rewrite: name the actual difference and evidence.
+
+### False Ranges
+
+- Risk: implies coverage without specifying a real set.
+- Common phrases: `from X to Y and everything in between`,
+  `across every dimension`, `at every level`.
+- Keep when the range is enumerated and supported.
+- Rewrite: list the real scope or state the boundary.
+
+### Vertical Bold-Header Lists
+
+- Risk: makes every paragraph look like a generic AI outline.
+- Common phrases: repeated bullets beginning with `**Key point:**`,
+  `**Important:**`, or similar bold labels.
+- Keep when scanning is the main goal.
+- Rewrite: use paragraphs or a real table when the labels do not add structure.
+
 ## Structure Preservation Rules
 
 - Preserve the user's heading hierarchy unless it is broken or conflicts with
@@ -118,6 +147,7 @@ Rules:
   names.
 - Preserve meaning before improving rhythm.
 - Do not flatten a document into bullet points unless scanning is the goal.
+- After rewriting factual prose, re-check claims against the source boundary.
 
 ## Markdown Protection Rules
 

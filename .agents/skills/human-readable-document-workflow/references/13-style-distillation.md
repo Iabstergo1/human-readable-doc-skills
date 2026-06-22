@@ -63,6 +63,10 @@ Do not extract:
 If the target document needs facts, use only the facts supplied for the target
 document. Never import facts from the style sample.
 
+Style is not stance. A sample can teach rhythm, structure, and reader
+relationship without carrying over its opinions, confidence level, or
+recommendations.
+
 ## Confidence Rules
 
 | Evidence | Confidence |

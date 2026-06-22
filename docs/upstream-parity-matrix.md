@@ -17,6 +17,9 @@ Allowed status values:
 
 | Upstream project | Upstream capability | Local implementation | Status | Action |
 | --- | --- | --- | --- | --- |
+| Codex official docs | Repo skill structure: `SKILL.md` plus optional scripts and references. | `.agents/skills/...` follows this layout. | implemented | Keep `SKILL.md` as entrypoint. |
+| Codex official docs | Progressive disclosure through concise skill descriptions. | `SKILL.md` routes to focused references. | implemented | Do not merge long rules into `SKILL.md`. |
+| Codex official docs | Repository guidance belongs in `AGENTS.md`. | Project rules stay in root `AGENTS.md`. | implemented | Keep skill behavior out of `AGENTS.md`. |
 | Writer's Loop | Frame, question gate, plan, checkpoint, draft, critique, propose, decide, revise, evaluate. | `01-writing-loop.md` covers the core loop. | implemented | Keep as workflow layer. |
 | Writer's Loop | Plan checkpoint pause. | `01-writing-loop.md` requires a checkpoint for substantial or risky drafts. | implemented | Use before drafting high-risk documents. |
 | Writer's Loop | Revision proposal one-by-one decision. | `01-writing-loop.md` has propose and decide phases. | partially implemented | Keep proposals explicit when user review is required. |
@@ -24,7 +27,9 @@ Allowed status values:
 | Writer's Loop | Style distillation and style pack. | `13-style-distillation.md` defines session-only style packs. | implemented | Load only for style learning or voice matching. |
 | Writer's Loop | Style-versus-content boundary. | `13-style-distillation.md` separates extractable style from facts. | implemented | Enforce before using samples. |
 | Writer's Loop | Style match review. | `13-style-distillation.md` adds a style-match review pass. | implemented | Run after applying a style pack. |
-| Writer's Loop | Translation workflow. | `01-writing-loop.md` treats document translation as a mode. | intentionally out of scope | Use only for reusable document translation. |
+| Writer's Loop | Technical writing checklist. | `12-document-type-profiles.md` and `10-quality-gates.md` cover technical docs. | implemented | Keep concrete I/O, risks, and validation. |
+| Writer's Loop | Business writing checklist. | `12-document-type-profiles.md` covers reports and proposals. | implemented | Keep evidence, options, risks, and decisions. |
+| Writer's Loop | Translation workflow. | `01-writing-loop.md` treats document translation as a mode. | partially implemented | Use only for reusable document transformation. |
 | Writer's Loop | Multi-agent validation. | `01-writing-loop.md` limits this to high-stakes, long, or ambiguous docs. | implemented | Do not default to subagents. |
 | Writer's Loop | Durable preference journal and local style storage. | This repo does not manage durable memory. | intentionally out of scope | Require explicit user request. |
 | qu-ai-wei | Simplified Chinese scope. | `03-anti-ai-slop-zh.md` is zh-CN-specific. | implemented | Keep separate from English rules. |
@@ -36,7 +41,7 @@ Allowed status values:
 | qu-ai-wei | No invented facts. | Source-boundary gates and zh rules enforce it. | implemented | Keep in every polish pass. |
 | qu-ai-wei | Register downgrade protection. | Zh preflight and serious gates protect formal text. | implemented | Do not casualize technical or academic prose. |
 | qu-ai-wei | Over-sanitization countermeasure. | Zh preflight and second-pass gate check for voice loss. | implemented | Preserve human hesitation and voice where valid. |
-| qu-ai-wei | 51 AI-slop pattern classes. | Local rules cover the common subset only. | needs source text | Paste full rule text before fuller migration. |
+| qu-ai-wei | 51 AI-slop pattern classes. | Local rules cover the common document-safe subset only. | partially implemented | Source is reachable, but the full taxonomy is not vendored. |
 | qu-ai-wei | Active polish rules. | Local lint and references support conservative polish. | partially implemented | Avoid platform-specific overreach. |
 | qu-ai-wei | Whitelists. | Not carried as reusable whitelist files. | intentionally out of scope | Add only for a defined brand or corpus. |
 | qu-ai-wei | Brand voice. | Not a generic document workflow concern. | intentionally out of scope | Add per user-provided brand style. |
@@ -58,18 +63,23 @@ Allowed status values:
 | unslop | Tricolon padding. | `lint_ai_style.py` flags rule-of-three padding. | implemented | Use mode-sensitive severity. |
 | unslop | Em-dash overuse. | English rules limit overuse, not legitimate dashes. | implemented | Do not use an absolute ban. |
 | unslop | Bullet-soup. | Layout and zh rules discourage excessive lists. | partially implemented | Detect structurally in future if needed. |
+| unslop | Subtract, do not add. | English and quality gates require source-boundary preservation. | implemented | Remove filler without adding claims. |
+| unslop | Style and stance separation. | `13-style-distillation.md` separates style from content. | implemented | Do not import sample stance as fact. |
 | unslop | Technical preservation. | Markdown and source-boundary rules protect code and terms. | implemented | Never rewrite protected blocks destructively. |
+| unslop | Preserve real uncertainty. | `10-quality-gates.md` protects assumptions and uncertainty. | implemented | Do not convert caveats into fake confidence. |
+| unslop | Fact verification boundary after rewriting. | Source Boundary Gate applies after style cleanup. | implemented | Re-check claims after edits. |
 | unslop | Voice matching. | `13-style-distillation.md` supports session style packs. | partially implemented | Durable voice memory is out of scope. |
+| unslop | Mode concepts. | Local `--mode` supports document-safe, creative-blog, serious-review, zh-source-safe. | partially implemented | Do not copy session-wide slash modes. |
 | unslop | Slash modes. | Slash command modes are not supported here. | intentionally out of scope | This is not a session-wide mode plugin. |
 | unslop | Session-wide persistence. | Not supported. | intentionally out of scope | Use explicit task scope only. |
 | unslop | Hooks and statusline. | Not supported. | intentionally out of scope | Avoid plugin behavior in this skill. |
-| unslop | PR comment review. | This repo is document-focused, not code review prose. | intentionally out of scope | Use GitHub review skills instead. |
+| unslop | Review comments preserve exact identifiers and line references. | Not a default document workflow. | intentionally out of scope | Use only for code-review prose tasks. |
 | anti-slop-writing | Detector-oriented perplexity, burstiness, stylometry. | Split into document-safe and creative/blog modes. | partially implemented | Do not use detector rules on formal docs. |
 | anti-slop-writing | Hard vocabulary banlist. | Local rules use warnings, not absolute bans. | intentionally out of scope | Preserve domain language and user voice. |
 | anti-slop-writing | Structural pattern avoidance. | English rules flag generic openings and template endings. | implemented | Use mode-specific intensity. |
 | anti-slop-writing | Rule of three. | `lint_ai_style.py` flags tricolon padding. | implemented | Stronger in creative/blog mode. |
-| anti-slop-writing | Negative parallelisms. | Not separately modeled. | missing | Add only if source examples show repeated failures. |
-| anti-slop-writing | False ranges. | Not separately modeled. | missing | Add if fixture coverage justifies it. |
+| anti-slop-writing | Negative parallelisms. | `lint_ai_style.py` flags detector-style negative pairs. | implemented | Use mainly in creative/blog mode. |
+| anti-slop-writing | False ranges. | `lint_ai_style.py` flags vague binary or range claims. | implemented | Replace with real boundary or evidence. |
 | anti-slop-writing | Formulaic conclusions. | English rules flag template conclusions. | implemented | Keep academic conclusions when needed. |
 | anti-slop-writing | Vertical list with bold header avoidance. | Markdown/layout rules discourage over-formatting. | partially implemented | Add structural lint only if needed. |
 | anti-slop-writing | Em dash ban. | Replaced with overuse check. | intentionally out of scope | Absolute bans break valid prose. |
@@ -85,6 +95,11 @@ Allowed status values:
 | codex-be-serious | Chinese internet vernacular cleanup. | Serious mode flags common workplace and internet slang. | implemented | Enable for formal zh documents. |
 | codex-be-serious | Review output shape. | Formal review shape is documented but not default. | partially implemented | Use Assessment / Findings / Revision when requested. |
 | codex-be-serious | Session-wide register persistence. | Not supported. | intentionally out of scope | Apply only to the current document task. |
+| prompts.chat | Prompt library organization. | Examples and parity fixtures are grouped by workflow. | partially implemented | Do not copy prompt catalogs. |
+| prompts.chat | Runtime skill source. | Not treated as a runtime skill source. | intentionally out of scope | Use only for organization methodology. |
+| ChatGPT Prompts for Academic Writing | Academic task decomposition. | `05-academic-writing.md` and profiles cover paper sections. | implemented | Keep section boundaries explicit. |
+| ChatGPT Prompts for Academic Writing | Citation formatting for user-provided sources. | Academic and source gates forbid fabricated citations. | implemented | Format only supplied or verified sources. |
+| ChatGPT Prompts for Academic Writing | Prompt catalog mirroring. | Not copied into this project. | intentionally out of scope | Keep as methodology reference only. |
 
 ## Summary
 
@@ -100,5 +115,6 @@ Intentionally out-of-scope capabilities are session-wide modes, hooks,
 statusline behavior, durable preference memory, brand/platform-specific voice
 systems, detector-first rewriting, and code-review-specific workflows.
 
-Needs-source-text items are long upstream rule sets that were not fully
-available as reliable, line-preserved source during this audit.
+No current item is marked `needs source text`. Long upstream taxonomies are
+reachable, but this project intentionally rewrites only the document-safe
+subset instead of vendoring full upstream rule catalogs.

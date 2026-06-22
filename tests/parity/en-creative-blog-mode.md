@@ -5,6 +5,9 @@
 This guide covers speed, scale, and simplicity. In conclusion, the future is
 bright for teams that embrace this revolutionary approach.
 
+This is not just a workflow but a movement from planning to execution and
+everything in between.
+
 ## Expected Route
 
 Classify as blog or general article cleanup. Use `creative-blog` mode.
@@ -19,6 +22,8 @@ Classify as blog or general article cleanup. Use `creative-blog` mode.
 - `tricolon-padding`
 - `template-conclusion`
 - `empty-enthusiasm`
+- `negative-parallelism`
+- `false-range`
 
 ## Expected Behavior
 

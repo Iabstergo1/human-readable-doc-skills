@@ -43,6 +43,8 @@ Non-goal: not a user-facing product overview.
   results.
 - Do not import facts from a style sample into the target document.
 - Do not treat a tone sample as evidence for claims.
+- After anti-slop or humanization edits, re-check factual claims because style
+  cleanup can accidentally remove uncertainty or add confidence.
 
 ## Source Boundary Gate
 
@@ -113,6 +115,7 @@ Check after the first rewrite:
 - Was likely human speech, hesitation, dialect, or personal texture damaged?
 - Did the edit only swap words without improving structure or fact density?
 - Did the text become more casual than the document type allows?
+- Did the edit add new claims instead of subtracting filler?
 
 If the second pass finds voice loss, restore the user's tone and limit the edit
 to concrete defects: empty claims, unsupported exaggeration, template openings,
