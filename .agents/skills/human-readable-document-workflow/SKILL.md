@@ -14,6 +14,9 @@ description: >-
 Use this skill as the orchestration layer for long-form document source work.
 Keep the main file short: route the task, load only relevant references, use
 scripts for deterministic checks, and deliver a clean Markdown source draft.
+This local `SKILL.md` is the only active entrypoint. Upstream skills are
+methodology references only; their trigger metadata, slash modes, hooks, and
+session-wide behavior do not apply unless rewritten here.
 
 ## Trigger Boundary
 
@@ -59,6 +62,9 @@ Read only the references needed for the current task:
 - Final checks: `references/10-quality-gates.md`
 - Upstream attribution: `references/11-upstream-attribution.md`
 - Document type profiles: `references/12-document-type-profiles.md`
+- Style distillation: `references/13-style-distillation.md` only when the user
+  asks for style learning, voice matching, writing like a sample, or reusable
+  style guidance.
 
 ## Four-Layer Framework
 
@@ -74,12 +80,18 @@ do not skip fact-boundary checks.
    anti-slop reference:
    `references/03-anti-ai-slop-zh.md` for Chinese,
    `references/04-anti-ai-slop-en.md` for English, or both for mixed text.
+   For Chinese humanization, apply the preflight gate and register matrix in
+   `references/03-anti-ai-slop-zh.md`. For English, use document-safe mode for
+   formal documents and creative/blog mode only for public-facing articles,
+   essays, social posts, or content copy.
 
 3. **Document structure layer**
    Load the profile from `references/12-document-type-profiles.md`.
    Also load `references/05-academic-writing.md` for academic papers,
    literature reviews, thesis sections, model descriptions, citation work, or
    any text that uses scholarly claims, variables, symbols, or references.
+   For formal technical, academic, proposal, SOP, report, or policy-like prose,
+   apply the Serious Register Gate in `references/10-quality-gates.md`.
 
 4. **Markdown source and handoff layer**
    Load `references/06-document-layout.md` and

@@ -128,6 +128,19 @@ stable.
 - Quality check: is it clear whether the user approved, requested changes, or
   waived review?
 
+For substantial new documents, expose the checkpoint in this compact shape:
+
+```markdown
+Plan checkpoint:
+- Proposed structure:
+- Source gaps:
+- Risky assumptions:
+- Need your decision: approve, adjust, or skip checkpoint.
+```
+
+If the user response is ambiguous, ask whether they approve the plan or want
+changes. Do not treat "looks good" as a durable style preference.
+
 ### 6. Draft
 
 - Purpose: produce the first coherent version.
@@ -169,6 +182,15 @@ such as "make it clearer" unless paired with a concrete defect.
 - Failure modes: treating silence, praise, or a fact correction as a durable
   style preference.
 - Quality check: are rejected changes kept out of the final draft?
+
+For revision proposals that require user review, use one decision per item:
+
+```markdown
+Decision record:
+- Proposal:
+- User decision: apply / reject / adjust / undo / unresolved.
+- Durable preference: yes only if the user explicitly says so.
+```
 
 ### 10. Revise
 

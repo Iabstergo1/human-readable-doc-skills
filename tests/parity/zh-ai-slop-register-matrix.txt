@@ -1,0 +1,30 @@
+# 中文语体矩阵
+
+## Input
+
+请把这段技术设计写得不那么 AI：
+
+随着数字化转型不断深入，该 PDF 预处理方案具有重要意义。它不仅是一个技术工具，更是未来文档智能发展的重要基础，能够全方位赋能业务闭环。
+
+## Expected Route
+
+Classify as `technical-design`, then use zh anti-slop with the technical-design
+register matrix row.
+
+## Expected References
+
+- `references/03-anti-ai-slop-zh.md`
+- `references/12-document-type-profiles.md`
+- `references/10-quality-gates.md`
+
+## Expected Lint Categories
+
+- `generic-opening`
+- `empty-significance`
+- `false-depth`
+- `marketing-tone`
+
+## Expected Behavior
+
+Remove vague elevation while preserving technical terms. Do not make the
+document casual, jokey, or first-person.

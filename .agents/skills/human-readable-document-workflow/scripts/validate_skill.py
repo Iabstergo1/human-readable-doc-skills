@@ -25,6 +25,7 @@ REQUIRED_REFERENCES = [
     "references/10-quality-gates.md",
     "references/11-upstream-attribution.md",
     "references/12-document-type-profiles.md",
+    "references/13-style-distillation.md",
 ]
 
 REQUIRED_SCRIPTS = [

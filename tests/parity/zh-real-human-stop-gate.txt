@@ -1,0 +1,27 @@
+# 中文真人声口门检
+
+## Input
+
+请帮我去 AI 味：
+
+嗯，我当时其实有点犹豫，因为这个方案不是不能做，就是后面维护会很烦。
+你要是问我值不值得，我可能会说先别急着上。
+
+## Expected Route
+
+Use Chinese humanization. Run the preflight gate before rewriting.
+
+## Expected References
+
+- `references/03-anti-ai-slop-zh.md`
+- `references/10-quality-gates.md`
+
+## Expected Lint Categories
+
+- `zh-real-human-risk`
+
+## Expected Behavior
+
+Treat the input as likely human speech. Stop or do format-only cleanup unless
+the user clarifies that they want simplification, translation, summary, or a
+specific register change.

@@ -48,6 +48,15 @@ DOCUMENT_TRIGGERS = [
     "readme",
     "meeting notes",
     "email",
+    "风格",
+    "语气",
+    "模仿",
+    "沿用",
+    "voice match",
+    "style match",
+    "write like",
+    "learn the style",
+    "same voice",
 ]
 
 FORMAT_RULES = {
@@ -98,6 +107,22 @@ EXPORT_VERBS = (
 )
 
 FUTURE_EXPORT_MARKERS = r"后续|之后|随后|later|afterward"
+
+STYLE_TERMS = [
+    "学习风格",
+    "匹配风格",
+    "模仿",
+    "沿用风格",
+    "照着这个风格",
+    "像这个样例",
+    "voice match",
+    "style match",
+    "write like",
+    "learn the style",
+    "match this voice",
+    "same voice",
+    "same style",
+]
 
 
 def read_text(args: argparse.Namespace) -> str:
@@ -202,6 +227,8 @@ def recommended_references(
             "references/12-document-type-profiles.md",
         ]
     )
+    if any(term in text.lower() for term in STYLE_TERMS):
+        refs.append("references/13-style-distillation.md")
     return list(dict.fromkeys(refs))
 
 

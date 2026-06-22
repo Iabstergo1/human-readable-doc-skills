@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 SEVERITY_ORDER = {"info": 0, "warning": 1, "error": 2}
+MODE_CHOICES = ("document-safe", "creative-blog", "serious-review", "zh-source-safe")
 
 
 @dataclass(frozen=True)
@@ -24,6 +25,7 @@ class Rule:
     message: str
     suggestion: str
     replacement: str | None = None
+    modes: tuple[str, ...] = ()
 
 
 RULES = [
@@ -132,7 +134,7 @@ RULES = [
         "en",
         "empty-enthusiasm",
         "warning",
-        r"game-changer|unlock the full potential|revolutionary",
+        r"game-changer|unlock the full potential|revolutionary|awesome|magical|magic\b",
         "Empty enthusiasm overpromises without evidence.",
         "State the observable improvement and condition.",
         "",
@@ -156,6 +158,105 @@ RULES = [
         "Template conclusions often repeat the introduction generically.",
         "End with a decision, risk, limitation, or next step.",
         "",
+    ),
+    Rule(
+        "zh-real-human-risk",
+        "zh-CN",
+        "zh-real-human-risk",
+        "warning",
+        r"嗯|呃|怎么说|说实话|我当时|其实有点|可能吧|就是.{0,8}吧|你要是问我",
+        "文本可能是真人声口，直接去 AI 腔可能会损伤原意和语气。",
+        "先停手或只做格式清理；如需改写，确认是改语体、简化、翻译还是摘要。",
+        None,
+        ("zh-source-safe",),
+    ),
+    Rule(
+        "zh-register-downgrade",
+        "zh-CN",
+        "zh-register-downgrade",
+        "warning",
+        r"改得.{0,8}口语|别.{0,4}正式|像朋友聊天|去掉.{0,8}术语|小学生也能懂",
+        "语体降级要求可能破坏正式文档的精确性。",
+        "先确认目标语体；技术、学术、SOP 和公文类文本应保留必要正式性。",
+        None,
+        ("zh-source-safe", "serious-review"),
+    ),
+    Rule(
+        "zh-over-sanitized",
+        "zh-CN",
+        "zh-over-sanitized",
+        "info",
+        r"完全中性|去掉.{0,8}个人|删掉.{0,8}口头|统一成客观|不要任何情绪",
+        "过度消毒可能把真人文本改成无菌中性文。",
+        "保留有信息量的个人判断、犹疑和真实语气，只删除模板化噪音。",
+        None,
+        ("zh-source-safe",),
+    ),
+    Rule(
+        "en-detectorish-overcorrection",
+        "en",
+        "en-detectorish-overcorrection",
+        "warning",
+        r"AI detector|perplexity|burstiness|stylometry|make it less detectable|sentence fragments",
+        "Detector-oriented rewriting can damage formal documents.",
+        "Use document-safe cleanup unless the user explicitly requested creative or blog style.",
+        None,
+        ("document-safe", "creative-blog"),
+    ),
+    Rule(
+        "en-tricolon-padding",
+        "en",
+        "tricolon-padding",
+        "info",
+        r"\b[A-Za-z][A-Za-z-]+,\s+[A-Za-z][A-Za-z-]+,\s+and\s+[A-Za-z][A-Za-z-]+\b",
+        "Rule-of-three phrasing can become padded and automatic.",
+        "Keep the list only when all three items are distinct and useful.",
+        None,
+        ("creative-blog", "document-safe"),
+    ),
+    Rule(
+        "en-em-dash-overuse",
+        "en",
+        "em-dash-overuse",
+        "info",
+        r"—.{0,80}—|--.{0,80}--",
+        "Repeated dash framing can make sentences sound machine-patterned.",
+        "Keep a dash only when it clarifies interruption or apposition.",
+        None,
+        ("document-safe", "creative-blog"),
+    ),
+    Rule(
+        "serious-register-violation",
+        "mixed",
+        "serious-register-violation",
+        "warning",
+        r"awesome|super\b|magic|magically|crush it|no-brainer|🚀|✨|😊|牛逼|绝绝子|YYDS|拿捏|打工人",
+        "Formal documents should avoid slang, emoji, hype, and forced friendliness.",
+        "Use sober professional wording tied to observable behavior.",
+        None,
+        ("serious-review",),
+    ),
+    Rule(
+        "software-anthropomorphism",
+        "mixed",
+        "serious-register-violation",
+        "warning",
+        r"system understand(?:s)?|tool understand(?:s)?|模型理解用户|系统理解用户|工具理解用户",
+        "Anthropomorphized software descriptions blur actual system behavior.",
+        "Describe the operation: classify, parse, predict, rank, match, or generate.",
+        None,
+        ("serious-review", "document-safe"),
+    ),
+    Rule(
+        "style-content-leak",
+        "mixed",
+        "style-content-leak",
+        "warning",
+        r"reuse.{0,40}(customer|client|company|metric|facts)|copy.{0,40}(facts|names|example)|沿用.{0,20}(事实|客户名|公司名|数据|情节)",
+        "Style samples must not donate facts, names, metrics, quotes, or plot events.",
+        "Extract style traits only; use target-document facts for content.",
+        None,
+        MODE_CHOICES,
     ),
 ]
 
@@ -204,7 +305,20 @@ def protected_lines(text: str) -> set[int]:
     return protected
 
 
-def should_skip_rule(rule: Rule, line: str) -> bool:
+def rule_applies_to_mode(rule: Rule, mode: str) -> bool:
+    return not rule.modes or mode in rule.modes
+
+
+def should_skip_rule(rule: Rule, line: str, mode: str) -> bool:
+    if mode == "document-safe" and rule.id == "en-tricolon-padding":
+        has_formal_context = re.search(
+            r"risk|cost|scope|speed|scale|security|accuracy|latency|inputs?|outputs?",
+            line,
+            flags=re.IGNORECASE,
+        )
+        if has_formal_context:
+            return True
+
     if rule.id == "zh-mechanical-transition":
         has_order_marker = re.search(r"首先|其次|最后", line)
         has_ordered_context = re.search(
@@ -228,7 +342,11 @@ def should_skip_rule(rule: Rule, line: str) -> bool:
     return False
 
 
-def lint_text(text: str, min_severity: str = "info") -> list[dict[str, object]]:
+def lint_text(
+    text: str,
+    min_severity: str = "info",
+    mode: str = "document-safe",
+) -> list[dict[str, object]]:
     issues: list[dict[str, object]] = []
     protected = protected_lines(text)
     threshold = SEVERITY_ORDER[min_severity]
@@ -236,9 +354,11 @@ def lint_text(text: str, min_severity: str = "info") -> list[dict[str, object]]:
         if line_no in protected:
             continue
         for rule in RULES:
+            if not rule_applies_to_mode(rule, mode):
+                continue
             if SEVERITY_ORDER[rule.severity] < threshold:
                 continue
-            if should_skip_rule(rule, line):
+            if should_skip_rule(rule, line, mode):
                 continue
             if re.search(rule.pattern, line, flags=re.IGNORECASE):
                 issues.append(
@@ -248,6 +368,7 @@ def lint_text(text: str, min_severity: str = "info") -> list[dict[str, object]]:
                         "severity": rule.severity,
                         "language": rule.language,
                         "category": rule.category,
+                        "mode": mode,
                         "message": rule.message,
                         "suggestion": rule.suggestion,
                         "text": line.strip(),
@@ -256,7 +377,7 @@ def lint_text(text: str, min_severity: str = "info") -> list[dict[str, object]]:
     return issues
 
 
-def apply_fixes(text: str) -> str:
+def apply_fixes(text: str, mode: str = "document-safe") -> str:
     lines = text.splitlines()
     protected = protected_lines(text)
     fixed_lines: list[str] = []
@@ -264,6 +385,8 @@ def apply_fixes(text: str) -> str:
         fixed = line
         if line_no not in protected:
             for rule in RULES:
+                if not rule_applies_to_mode(rule, mode):
+                    continue
                 if rule.replacement is not None:
                     fixed = re.sub(rule.pattern, rule.replacement, fixed, flags=re.IGNORECASE)
             fixed = re.sub(r"[ \t]+$", "", fixed)
@@ -284,12 +407,21 @@ def format_text(result: dict[str, object]) -> str:
 
 
 def main() -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
     parser = argparse.ArgumentParser(description="Lint common AI-style phrases in text.")
     parser.add_argument("input", help="Markdown or text file to inspect.")
     parser.add_argument("--fix", action="store_true", help="Apply conservative removals/replacements.")
     parser.add_argument("--no-fix", action="store_true", help="Explicitly disable fixes. This is the default.")
     parser.add_argument("--output", "-o", help="Write fixed text to this file. Defaults to stdout with --fix.")
     parser.add_argument("--format", choices=["json", "text"], default="json", help="Output format.")
+    parser.add_argument(
+        "--mode",
+        choices=MODE_CHOICES,
+        default="document-safe",
+        help="Anti-slop mode. Defaults to document-safe.",
+    )
     parser.add_argument(
         "--min-severity",
         choices=["info", "warning", "error"],
@@ -301,17 +433,17 @@ def main() -> int:
 
     input_path = Path(args.input)
     text = input_path.read_text(encoding="utf-8")
-    issues = lint_text(text, min_severity=args.min_severity)
+    issues = lint_text(text, min_severity=args.min_severity, mode=args.mode)
 
     if args.fix and not args.no_fix:
-        fixed = apply_fixes(text)
+        fixed = apply_fixes(text, mode=args.mode)
         if args.output:
             Path(args.output).write_text(fixed, encoding="utf-8", newline="\n")
         else:
             sys.stdout.write(fixed)
         return 1 if issues else 0
 
-    result = {"ok": not issues, "issue_count": len(issues), "issues": issues}
+    result = {"ok": not issues, "mode": args.mode, "issue_count": len(issues), "issues": issues}
     if args.format == "text":
         print(format_text(result))
     else:

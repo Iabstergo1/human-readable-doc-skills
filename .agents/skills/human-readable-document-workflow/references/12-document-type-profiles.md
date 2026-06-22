@@ -18,6 +18,26 @@ Each profile defines structure, tone, references, source notes, and boundaries.
 | `email` | Professional emails, announcements, outreach, and follow-ups. |
 | `general-article` | Essays, explanatory articles, blog-like documents. |
 
+## Anti-Slop Mode Map
+
+Use this map before applying `references/03-anti-ai-slop-zh.md` or
+`references/04-anti-ai-slop-en.md`.
+
+| Profile | Default anti-slop mode | Notes |
+| --- | --- | --- |
+| `technical-design` | `document-safe` | Preserve terms, constraints, errors, and implementation detail. |
+| `README` | `document-safe` | Remove hype without losing setup and usage precision. |
+| `academic-paper` | `document-safe` | Keep formal qualifiers, variables, and citation boundaries. |
+| `literature-review` | `document-safe` | Do not invent source coverage or citation clusters. |
+| `business-report` | `document-safe` | Prefer evidence, options, and decisions over growth language. |
+| `proposal` | `document-safe` | Be persuasive but source-bounded. |
+| `manual / SOP` | `document-safe` | Lists and formal sequence markers are often necessary. |
+| `meeting-notes` | `document-safe` | Preserve decisions, disagreements, owners, and open questions. |
+| `email` | `document-safe` | Keep appropriate politeness without flattery. |
+| `general-article` | `creative-blog` when public-facing; otherwise `document-safe`. | Match the user's requested venue. |
+| `social/content-copy` | `creative-blog` | Use only when the task is explicitly platform or copy oriented. |
+| `public-formal/policy-like` | `document-safe` | Preserve formal register and responsibility boundaries. |
+
 ## Technical Design
 
 ### Trigger Keywords
